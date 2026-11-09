@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Тренажёр иероглифов</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6fbfe;--card:#fff;--tx:#1d1d1b;--mu:#66707a;--bd:#cfdde6;--ac:#1f8fd1;--ok:#1f8a4c;--okb:#e3f4ea;--no:#c0392b;--nob:#fbe7e4}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14181b;--card:#1e2327;--tx:#ececE8;--mu:#97a2ac;--bd:#38424a;--ac:#5bb8f0;--ok:#5fd18d;--okb:#17301f;--no:#ff8a7a;--nob:#3a1d19}}
+:root[data-theme="dark"]{--bg:#14181b;--card:#1e2327;--tx:#ececE8;--mu:#97a2ac;--bd:#38424a;--ac:#5bb8f0;--ok:#5fd18d;--okb:#17301f;--no:#ff8a7a;--nob:#3a1d19}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.45 system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+#app{max-width:560px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:8px 0 4px}p{color:var(--mu);margin:4px 0 12px}
+button,input{font:inherit;color:inherit}button{cursor:pointer}
+.b{display:block;width:100%;text-align:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:8px 0}
+.p{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
+input[type=text]{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px;margin:4px 0}
+.hz{font-size:24px}
+.m{color:var(--mu);font-size:14px;display:flex;justify-content:space-between}
+.bar{height:6px;background:var(--bd);border-radius:3px;margin:8px 0 14px}.bar i{display:block;height:100%;background:var(--ac);border-radius:3px}
+.q{font-size:21px;font-weight:600;margin:6px 0 2px}
+canvas{width:100%;height:170px;background:var(--card);border:1px dashed var(--bd);border-radius:12px;touch-action:none;display:block}
+.sy{margin:8px 0}.tn{display:flex;gap:6px}.tn button{flex:1;padding:9px 0;border:1px solid var(--bd);border-radius:10px;background:var(--card)}
+.tn .on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.r{border-radius:12px;padding:10px 12px;margin:8px 0}.ok{background:var(--okb)}.no{background:var(--nob)}
+.big{font-size:34px}
+.ls{display:flex;justify-content:space-between;gap:8px;text-align:left}.ls small{white-space:nowrap}.dis{opacity:.45}.hs{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:10px 0}.pb{height:8px;background:var(--bd);border-radius:4px;margin:6px 0}.pb i{display:block;height:100%;background:var(--ok);border-radius:4px}label{display:block;margin:10px 0;color:var(--mu)}
+small{color:var(--mu)}
+</style></head><body><div id="app"></div>
+<script>
+const M={a:"āáǎà",e:"ēéěè",i:"īíǐì",o:"ōóǒò",u:"ūúǔù",v:"ǖǘǚǜ"};
+function mark(s){const t=+s.slice(-1),b=s.slice(0,-1);if(!t)return b;let k=b.search(/[ae]/);if(k<0&&b.includes("ou"))k=b.indexOf("o");if(k<0){for(let j=b.length-1;j>=0;j--)if("iouv".includes(b[j])){k=j;break}}return b.slice(0,k)+M[b[k]][t-1]+b.slice(k+1)}
+const $=document.getElementById("app");
+const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let P={},X=[];try{P=JSON.parse(localStorage.getItem("hz1")||"{}");X=JSON.parse(localStorage.getItem("hz1x")||"[]")}catch(e){}
+const sv=()=>{try{localStorage.setItem("hz1",JSON.stringify(P));localStorage.setItem("hz1x",JSON.stringify(X))}catch(e){}};
+const mk=t=>t.split("\n").filter(Boolean).map(l=>{const p=l.split("|");return{h:p[0],s:p[1].split(" "),ru:p[2],pos:p[3],l:+p[4]||0}});
+const T=["你好","你是哪国人","那是你的书吗","图书馆在哪儿","清华大学在哪儿","现在几点","明天你有课吗","你的电话号码是多少","多少钱一本","你家有几口人","北京的冬天比较冷","在干什么呢","我打算去商店买东西","你喜欢什么颜色的","明天是我朋友的生日","周末你干什么","做客（一）","做客（二）","早睡早起比较好啊","看病人","中国朋友太热情了","他感冒了","你学了多长时间汉语","明天见","你得多锻炼锻炼了","快考试了","爸爸妈妈让我回家","考得怎么样","你什么时候去旅行","我要参加联欢会"];
+const LW={1:mk(`你好|ni3 hao3|здравствуйте, привет||1
+好|hao3|хороший|прил.|1
+你|ni3|ты|мест.|1
+是|shi4|быть, являться; да (в ответах)|гл.|1
+老师|lao3 shi1|учитель|сущ.|1
+吗|ma0|вопросительная частица|част.|1
+不|bu4|не; нет|част.|1
+我|wo3|я|мест.|1
+学生|xue2 sheng0|студент|сущ.|1
+她|ta1|она|мест.|1
+谢谢|xie4 xie0|благодарить; спасибо|гл.|1
+不客气|bu2 ke4 qi0|не за что||1
+您|nin2|Вы (вежл.)|мест.|1
+留学生|liu2 xue2 sheng1|иностранный студент|сущ.|3
+叫|jiao4|звать, называться|гл.|1
+什么|shen2 me0|что, какой|мест.|1
+名字|ming2 zi0|имя|сущ.|1`),2:mk(`同学|tong2 xue2|однокурсник, товарищ по учёбе|сущ.|1
+们|men0|суффикс мн. числа|суф.|1
+来|lai2|приходить; давай|гл.|1
+介绍|jie4 shao4|представить, рассказать (о)|гл.|2
+一下儿|yi2 xia4 er0|раз (однократность действия)|сч. сл.|0
+姓|xing4|носить фамилию; фамилия|гл./сущ.|2
+的|de0|притяжательная частица|част.|1
+哪|na3|какой, который|мест.|1
+国|guo2|страна|сущ.|1
+人|ren2|человек|сущ.|1
+他|ta1|он|мест.|1
+认识|ren4 shi0|знакомиться, быть знакомым|гл.|1
+很|hen3|очень|нареч.|1
+高兴|gao1 xing4|радостный|прил.|1
+也|ye3|тоже, также|нареч.|1
+呢|ne0|фразовая частица|част.|1`),3:mk(`那|na4|то, тот|мест.|1
+谁|shei2|кто, чей|мест.|1
+书|shu1|книга|сущ.|1
+同屋|tong2 wu1|сосед по комнате|сущ.|0
+汉语|han4 yu3|китайский язык|сущ.|1
+课本|ke4 ben3|учебник|сущ.|3
+词典|ci2 dian3|словарь|сущ.|3
+就是|jiu4 shi4|именно, то есть||4
+日语|ri4 yu3|японский язык|сущ.|0
+这|zhe4|это|мест.|1
+杂志|za2 zhi4|журнал|сущ.|4
+音乐|yin1 yue4|музыка|сущ.|3
+朋友|peng2 you0|друг, приятель|сущ.|1`),4:mk(`请问|qing3 wen4|позвольте спросить; скажите||1
+图书馆|tu2 shu1 guan3|библиотека|сущ.|3
+在|zai4|находиться|гл.|1
+哪儿|na3 er0|где|мест.|1
+对不起|dui4 bu0 qi3|быть виноватым; извините|гл.|1
+个|ge4|штука (универсальное счётное слово)|сч. сл.|1
+学校|xue2 xiao4|школа, учебное заведение|сущ.|1
+知道|zhi1 dao4|знать|гл.|1
+没关系|mei2 guan1 xi0|ничего, неважно, пустяки||1
+这儿|zhe4 er0|здесь|мест.|1
+教学|jiao4 xue2|преподавание, обучение|сущ.|4
+楼|lou2|здание|сущ.|2
+那儿|na4 er0|там|мест.|1
+宿舍|su4 she4|общежитие|сущ.|5
+北边|bei3 bian0|север, к северу|сущ.|0
+左边|zuo3 bian0|левая сторона, налево|сущ.|2
+右边|you4 bian0|правая сторона, направо|сущ.|2
+不用谢|bu2 yong4 xie4|не за что; пожалуйста||0
+不用|bu2 yong4|не надо, не стоит||3`),5:mk(`专业|zhuan1 ye4|специальность|сущ.|4
+国际|guo2 ji4|международный|прил.|4
+关系|guan1 xi0|связь, отношения|сущ.|3
+中文|zhong1 wen2|китайский язык|сущ.|1
+系|ji4|факультет|сущ.|5
+研究生|yan2 jiu1 sheng1|аспирант|сущ.|4
+现代|xian4 dai4|современность, современный|сущ.|5
+文学|wen2 xue2|литература|сущ.|5
+东边|dong1 bian0|восток, к востоку|сущ.|0
+有|you3|иметь, иметься, есть|гл.|1
+空儿|kong4 er0|свободное время|сущ.|0
+时候|shi2 hou0|время|сущ.|1
+欢迎|huan1 ying2|приветствовать; добро пожаловать|гл.|3
+去|qu4|идти|гл.|1
+玩儿|wan2 er0|играть, развлекаться|гл.|0
+卫生间|wei4 sheng1 jian1|туалет|сущ.|3
+教室|jiao4 shi4|аудитория, класс|сущ.|2
+旁边|pang2 bian1|сбоку, рядом|сущ.|2
+西边|xi1 bian0|запад, к западу|сущ.|0
+对|dui4|правильный, верный|прил.|1`),6:mk(`大学|da4 xue2|университет|сущ.|1
+早上|zao3 shang0|утро|сущ.|1
+几|ji3|сколько|мест.|1
+点|dian3|час|сущ.|1
+上课|shang4 ke4|идти на занятия; начало занятий|гл./сущ.|1
+大部分|da4 bu2 fen4|большинство, большая часть||0
+部分|bu4 fen0|часть|сущ.|4
+九|jiu3|девять|числ.|1
+我们|wo3 men0|мы|мест.|1
+八|ba1|восемь|числ.|1
+五十|wu3 shi2|пятьдесят|числ.|0
+分|fen1|минута|сущ.|1
+下课|xia4 ke4|закончить урок; конец занятий|гл./сущ.|1
+十|shi2|десять|числ.|1
+半|ban4|половина, пол-|числ.|1
+早|zao3|ранний, рано|прил.|1
+讲座|jiang3 zuo4|лекция, курс (занятий)|сущ.|5
+开始|kai1 shi3|начинать(ся)|гл.|2
+六|liu4|шесть|числ.|1
+现在|xian4 zai4|сейчас, теперь|сущ.|1
+差|cha4|недоставать, не хватать; без|гл.|3
+一|yi1|один|числ.|1
+刻|ke4|четверть (часа)|сч. сл.|3
+一会儿|yi2 hui4 er0|немного, на минуту; скоро||2
+见|jian4|увидеть|гл.|1`),7:mk(`明天|ming2 tian1|завтра|сущ.|1
+课|ke4|класс, занятие, урок|сущ.|1
+上午|shang4 wu3|день (до полудня)|сущ.|1
+下午|xia4 wu3|вторая половина дня|сущ.|1
+没有|mei2 you3|не (иметь)|част.|0
+自行车|zi4 xing2 che1|велосипед|сущ.|3
+吧|ba0|фразовая частица (предположение, просьба)|част.|1
+事|shi4|дело, событие|сущ.|1
+可是|ke3 shi4|но, а, однако|союз|3
+没问题|mei2 wen4 ti2|хорошо; без проблем||0
+钥匙|yao4 shi0|ключ|сущ.|4
+车|che1|машина, велосипед|сущ.|1
+下|xia4|низ, внизу, под|сущ.|1
+车棚|che1 peng2|навес для велосипедов|сущ.|0
+里|li0|внутри|сущ.|1
+后边|hou4 bian0|задняя сторона, позади|сущ.|0
+今天|jin1 tian1|сегодня|сущ.|1
+晚上|wan3 shang0|вечер|сущ.|1
+时间|shi2 jian1|время|сущ.|1
+电影院|dian4 ying3 yuan4|кинотеатр|сущ.|1
+电影|dian4 ying3|кино, кинофильм|сущ.|1
+听说|ting1 shuo1|говорят, что; как говорят|гл.|3
+有名|you3 ming2|знаменитый, известный|прил.|3
+当然|dang1 ran2|конечно, естественно|нареч.|3`),8:mk(`周末|zhou1 mo4|уикенд, конец недели|сущ.|3
+啊|a0|фразовая частица|част.|2
+不过|bu2 guo4|впрочем, однако|союз|4
+怎么|zen3 me0|как, каким образом|мест.|1
+走|zou3|идти, ходить|гл.|2
+路|lu4|дорога, путь, маршрут|сущ.|2
+和|he2|и|союз|1
+公共汽车|gong1 gong4 qi4 che1|автобус|сущ.|0
+都|dou1|все, всё, целиком|нареч.|1
+到|dao4|прибыть, доехать|гл.|1
+骑|qi2|ехать (на велосипеде, лошади)|гл.|3
+快|kuai4|быстрый, скорый|прил.|2
+分钟|fen1 zhong1|минута|сч. сл.|1
+就|jiu4|сразу, сейчас; именно|нареч.|2
+校园|xiao4 yuan2|кампус, школьный двор|сущ.|3
+东南|dong1 nan2|юго-восток|сущ.|3
+东|dong1|восток|сущ.|3
+号|hao4|число, номер|сущ.|1
+房间|fang2 jian1|комната, номер (в отеле)|сущ.|1
+多少|duo1 shao0|сколько|мест.|1
+室|shi4|комната|сущ.|3
+电话|dian4 hua4|телефон|сущ.|1
+号码|hao4 ma3|номер|сущ.|3
+手机|shou3 ji1|мобильный телефон|сущ.|1
+等|deng3|ждать|гл.|2`),9:mk(`师傅|shi1 fu0|мастер, наставник (обращение)|сущ.|4
+买|mai3|покупать|гл.|1
+啤酒|pi2 jiu3|пиво|сущ.|3
+售货员|shou4 huo4 yuan2|продавец|сущ.|0
+瓶|ping2|бутылка|сущ.|0
+钱|qian2|деньги, монета|сущ.|1
+块|kuai4|юань (разговорный вариант)|сч. сл.|1
+两|liang3|два, оба|числ.|1
+再|zai4|снова, ещё, опять|нареч.|1
+水|shui3|вода|сущ.|1
+一共|yi4 gong4|всего, итого|нареч.|3
+毛|mao2|мао (1/10 юаня)|сч. сл.|3
+给|gei3|давать|гл.|1
+小姐|xiao3 jie0|девушка (обращение)|сущ.|5
+看|kan4|смотреть|гл.|1
+这些|zhe4 xie1|эти||1
+要|yao4|хотеть, требовать, намереваться|гл.|1
+本|ben3|(для книг)|сч. сл.|1
+小|xiao3|маленький|прил.|1
+零钱|ling2 qian2|мелочь, разменные деньги|сущ.|4`),10:mk(`照片|zhao4 pian4|фотография|сущ.|3
+家|jia1|дом, семья|сущ.|1
+口|kou3|(для членов семьи)|сч. сл.|1
+爷爷|ye2 ye0|дедушка (по линии отца)|сущ.|2
+奶奶|nai3 nai0|бабушка (по линии отца)|сущ.|2
+爸爸|ba4 ba0|папа|сущ.|1
+妈妈|ma1 ma0|мама|сущ.|1
+哥哥|ge1 ge0|старший брат|сущ.|1
+姐姐|jie3 jie0|старшая сестра|сущ.|1
+家庭|jia1 ting2|семья, дом|сущ.|4
+一般|yi4 ban1|обычный; обычно, вообще|прил.|3
+只|zhi1|только|нареч.|1
+孩子|hai2 zi0|ребёнок|сущ.|1
+弟弟|di4 di0|младший брат|сущ.|1
+妹妹|mei4 mei0|младшая сестра|сущ.|1
+还|hai2|ещё, к тому же|нареч.|1
+条|tiao2|(для собак, рек, брюк)|сч. сл.|2
+狗|gou3|собака|сущ.|1
+这样|zhe4 yang4|такой, так|мест.|2`),11:mk(`天气|tian1 qi4|погода|сущ.|1
+怎么样|zen3 me0 yang4|как, какой|мест.|1
+不太|bu2 tai4|не слишком, не очень||0
+风|feng1|ветер|сущ.|3
+雨|yu3|дождь|сущ.|1
+冷|leng3|холодный|прил.|1
+度|du4|градус|сч. сл.|5
+晴天|qing2 tian1|солнечный день, ясный день|сущ.|0
+秋天|qiu1 tian1|осень|сущ.|3
+热|re4|горячий, жаркий|прил.|1
+舒服|shu1 fu0|удобный, уютный|прил.|2
+最|zui4|самый, больше всего|нареч.|2
+季节|ji4 jie2|сезон, время года|сущ.|3
+冬天|dong1 tian1|зима|сущ.|3
+比较|bi3 jiao4|сравнительно, вполне, довольно|нареч.|3
+差不多|cha4 bu0 duo1|почти|нареч.|3
+零下|ling2 xia4|ниже нуля|сущ.|4
+常常|chang2 chang2|часто, обычно|нареч.|3
+下|xia4|спускаться, идти (о снеге, дожде)|гл.|1
+雪|xue3|снег|сущ.|1
+常|chang2|часто|нареч.|3
+喜欢|xi3 huan0|нравиться, любить|гл.|1
+夏天|xia4 tian1|лето|сущ.|3
+游泳|you2 yong3|плавать, плыть|гл.|2
+春天|chun1 tian1|весна|сущ.|3`),12:mk(`喂|wei4|алло|межд.|1
+啊|a0|а, ой|межд.|2
+在|zai4|указывает на продолжающийся характер действия|предл.|1
+干|gan4|делать, заниматься|гл.|3
+做|zuo4|делать|гл.|1
+作业|zuo4 ye4|домашнее задание|сущ.|3
+每|mei3|каждый|мест.|2
+天|tian1|день|сущ.|1
+多|duo1|многочисленный|прил.|1
+星期三|xing1 qi1 san1|среда|сущ.|0
+中午|zhong1 wu3|полдень|сущ.|1
+节|jie2|занятие, урок|сч. сл.|3
+听写|ting1 xie3|диктант|сущ.|0
+所以|suo3 yi3|поэтому|союз|2
+酒吧|jiu3 ba1|бар|сущ.|5
+喝|he1|пить|гл.|1
+咖啡|ka1 fei1|кофе|сущ.|1
+书店|shu1 dian4|книжный магазин|сущ.|1
+对面|dui4 mian4|напротив|сущ.|4
+自己|zi4 ji3|сам, себя, свой|мест.|2
+正在|zheng4 zai4|как раз сейчас|нареч.|1
+唱|chang4|петь|гл.|1
+歌|ge1|песня|сущ.|1
+回|hui2|возвращаться|гл.|1`),13:mk(`借|jie4|брать взаймы, одалживать|гл.|3
+先|xian1|сначала, раньше|нареч.|3
+银行|yin2 hang2|банк|сущ.|3
+换|huan4|менять|гл.|3
+然后|ran2 hou4|потом, затем|союз|3
+商店|shang1 dian4|магазин|сущ.|1
+东西|dong1 xi0|вещь|сущ.|1
+咱们|zan2 men0|мы (с тобой)|мест.|3
+一起|yi4 qi3|вместе|нареч.|2
+关门|guan1 men2|закрывать двери, закрыто||0
+关|guan1|закрывать|гл.|3
+星期天|xing1 qi1 tian1|воскресенье|сущ.|1
+打算|da3 suan4|намереваться, планировать|гл.|3
+购物中心|gou4 wu4 zhong1 xin1|торговый центр|сущ.|0
+购物|gou4 wu4|ходить за покупками, покупать|гл.|4
+中心|zhong1 xin1|центр|сущ.|5
+贵|gui4|дорогой|прил.|1
+还可以|hai2 ke3 yi3|ничего, приемлемо||0
+质量|zhi4 liang4|качество|сущ.|4
+不错|bu2 cuo4|неплохо||2
+正|zheng4|как раз, именно|нареч.|2
+衣服|yi4 fu0|одежда|сущ.|1
+开门|kai1 men2|открывать дверь, открыто||0
+开|kai1|открывать|гл.|1`),14:mk(`件|jian4|(для предметов одежды)|сч. сл.|1
+白|bai2|белый|прил.|5
+毛衣|mao2 yi1|свитер|сущ.|4
+挺|ting3|весьма, чрезвычайно|нареч.|3
+好看|hao3 kan4|красивый, привлекательный|прил.|1
+容易|rong2 yi4|лёгкий, простой|прил.|3
+脏|zang4|грязный|прил.|3
+蓝|lan2|синий|прил.|3
+颜色|yan2 se4|цвет|сущ.|2
+有点儿|you3 dian3 er0|немного, чуть-чуть|нареч.|0
+深|shen1|тёмный|прил.|4
+浅|qian3|светлый, бледный|прил.|5
+黄|huang2|жёлтый|прил.|6
+漂亮|piao4 liang0|красивый, нарядный|прил.|1
+它|ta1|оно|мест.|1
+昨天|zuo2 tian1|вчера|сущ.|1
+新|xin1|новый|прил.|1
+辆|liang4|(для автотранспорта)|сч. сл.|3
+旧|jiu4|старый|прил.|3
+便宜|pian2 yi0|дешёвый|прил.|1
+丢|diu1|терять, утратить|гл.|3
+别的|bie2 de0|другой|мест.|3
+黑|hei1|чёрный|прил.|5
+灰|hui1|серый|прил.|5
+绿|lv4|зелёный|прил.|0`),15:mk(`晚饭|wan3 fan4|ужин|сущ.|1
+以后|yi3 hou4|потом, после|сущ.|3
+一直|yi4 zhi2|прямо, всё время|нареч.|3
+忙|mang2|быть занятым; занятой|гл./прил.|1
+准备|zhun3 bei4|готовить|гл.|2
+礼物|li3 wu4|подарок|сущ.|3
+生日|sheng1 ri4|день рождения|сущ.|2
+蛋糕|dang4 ao1|пирожное, торт|сущ.|3
+送|song4|дарить, провожать, отправлять|гл.|2
+说|shuo1|говорить|гл.|1
+特别|te4 bie2|особенный|прил.|3
+男|nan2|мужской, мужчина|прил.|1
+还是|hai2 shi0|или|союз|1
+女|nü3|женский, женщина|прил.|1
+可|ke3|можно, мочь, стоит|гл.|3
+比如|bi3 ru2|например||3
+巧克力|qiao3 ke4 li4|шоколад|сущ.|4
+甜|tian2|сладкий|прил.|3
+号|hao4|номер, размер|сущ.|1
+那么|na4 me0|тогда, в таком случае|союз|2
+束|shu4|(для цветов); букет|сч. сл.|5
+花|hua1|цветы, цветок|сущ.|2
+主意|zhu3 yi0|идея, мысль|сущ.|4`),16:mk(`又|you4|снова, опять|нареч.|3
+了|le0|модальная частица|част.|1
+看起来|kan4 qi0 lai0|похоже; на первый взгляд||0
+啦|la0|модальная частица|част.|6
+可以|ke3 yi3|мочь, можно, разрешено|гл.|1
+好好儿|hao3 hao1 er0|как следует, хорошенько|нареч.|0
+觉得|jue2 de0|чувствовать, казаться|гл.|1
+没意思|mei2 yi4 si0|скучный, неинтересный|прил.|2
+电视|dian4 shi4|ТВ, телевидение|сущ.|1
+洗|xi3|мыть, стирать|гл.|2
+睡懒觉|shui4 lan3 jiao4|поздно вставать|гл.|0
+睡觉|shui4 jiao4|спать|гл.|1
+出去|chu1 qu4|выходить|гл.|2
+逛|guang4|прогуливаться|гл.|4
+学习|xue2 xi2|учить(ся)|гл.|1
+不同|bu4 tong2|неодинаковый, разный|прил.|3
+安排|an1 pai2|устраивать, налаживать, планировать|гл.|4
+上|shang4|предыдущий, прошлый|прил.|1
+包|bao1|заворачивать|гл.|2
+饺子|jiao3 zi0|пельмени|сущ.|1
+迪厅|di2 ting1|дискотека|сущ.|0
+跳舞|tiao4 wu3|танцевать|гл.|2
+听|ting1|слушать|гл.|1
+音乐会|yin1 yue4 hui4|концерт|сущ.|0`),17:mk(`做客|zuo4 ke4|гостить, быть в гостях|гл.|3
+请进|qing3 jin4|пожалуйста, входите||0
+真|zhen1|действительно|нареч.|1
+干净|gan1 jing4|чистый|прил.|3
+坐|zuo4|сидеть, садиться|гл.|1
+哎呀|ai1 ya0|ах|межд.|5
+客气|ke4 qi0|вежливый|прил.|4
+一点儿|yi4 dian3 er0|немного, чуть-чуть|нареч.|1
+心意|xin1 yi4|намерение, желание, тёплые чувства|сущ.|7
+收下|shou1 xia4|принимать|гл.|0
+茶|cha2|чай|сущ.|1
+果汁|guo3 zhi1|фруктовый сок|сущ.|4
+随便|sui2 bian4|как угодно, запросто, любой|прил.|4
+行|xing2|ладно||3
+路上|lu4 shang0|по дороге, по пути||2
+顺利|shun4 li4|успешный, благополучный|прил.|4
+上|shang4|верх, на|сущ.|1
+挤|ji3|тесный|прил.|5
+打车|da3 che1|брать такси, ловить машину|гл.|2
+空调|kong1 tiao2|кондиционер|сущ.|3
+大巴|da4 ba1|автобус|сущ.|4
+地铁|di4 tie3|метро|сущ.|2
+饿|e4|голодный|прил.|3
+吃|chi1|есть|гл.|1
+会|hui4|уметь, мочь, владеть|гл.|1
+试|shi4|пытаться, пробовать|гл.|3`),18:mk(`好吃|hao3 chi1|вкусный, приятный на вкус|прил.|1
+味道|wei4 dao0|вкус, запах|сущ.|4
+北方|bei3 fang1|север, северная часть, к северу|сущ.|3
+过|guo4|проводить (время), отмечать|гл.|2
+节|jie2|праздник|сущ.|3
+客人|ke4 ren2|гость|сущ.|3
+南方|nan2 fang1|юг, южная часть, к югу|сущ.|3
+米饭|mi3 fan4|(вареный) рис|сущ.|1
+面食|mian4 shi2|мучные изделия|сущ.|0
+重要|zhong4 yao4|важный|прил.|3
+种|zhong3|вид, тип|сч. сл.|3
+食品|shi2 pin3|еда, продукты|сущ.|4
+麻烦|ma2 fan0|беспокойный, хлопотный|прил.|4
+少|shao3|редкий, малочисленный|прил.|1
+馅儿|xian4 er0|начинка|сущ.|0
+得|dei3|должен, следует, требуется|мод. гл.|2
+花|hua1|тратить|гл.|2
+超市|chao1 shi4|супермаркет|сущ.|1
+速冻|su4 dong4|быстро замораживать|гл.|0
+如果|ru2 guo3|если|союз|3
+的话|de0 hua4|если (в условных предложениях)||3
+想|xiang3|хотеть, думать, собираться|гл.|1
+袋|dai4|мешок, сумка|сч. сл.|0
+偷懒|tou1 lan3|лентяйничать, лениться|гл.|7
+大家|da4 jia1|все|мест.|1
+热闹|ren4 ao0|оживлённый, людный|прил.|4
+有意思|you3 yi4 si0|интересный|прил.|2`),19:mk(`多|duo1|как, насколько, сколь|мест.|1
+长|chang2|долгий, длинный|прил.|1
+年|nian2|год|сущ.|1
+习惯|xi2 guan4|быть привычным (к), привыкать|гл.|3
+生活|sheng1 huo2|жизнь|сущ.|3
+刚|gang1|только|нареч.|3
+已经|yi3 jing1|уже|нареч.|2
+不好意思|bu4 hao3 yi4 si0|чувствовать неловкость, стесняться|гл.|2
+才|cai2|только, только тогда|нареч.|3
+起床|qi3 chuang2|вставать (с постели)|гл.|1
+床|chuang2|кровать|сущ.|2
+睡|shui4|спать|гл.|1
+夜里|ye4 li0|ночь|сущ.|0
+点钟|dian3 zhong1|час|сущ.|0
+早睡早起|zao3 shui4 zao3 qi3|рано ложиться и рано вставать||0
+工作|gong1 zuo4|работать|гл.|1
+毛病|mao2 bing4|недостаток, изъян|сущ.|5
+改|gai3|менять, переделывать|гл.|4
+大|da4|старший, большой (о возрасте)|прил.|1
+年纪|nian2 ji4|возраст|сущ.|5
+大概|da4 gai4|вероятно, приблизительно|нареч.|3
+岁|sui4|год (о возрасте)|сч. сл.|1`),20:mk(`看|kan4|навестить, обратиться (к врачу)|гл.|1
+别客气|bie2 ke4 qi0|не стесняйтесь; пожалуйста||0
+别|bie2|не (в побудительных предложениях)|част.|1
+无聊|wu2 liao2|скучный, неинтересный|прил.|4
+做梦|zuo4 meng4|видеть сон, мечтать|гл.|4
+幸福|xing4 fu2|счастливый|прил.|4
+背|bei4|читать наизусть, заучивать|гл.|4
+生词|sheng1 ci2|новые слова|сущ.|0
+考试|kao3 shi4|сдавать экзамен; экзамен|гл./сущ.|1
+累|lei4|усталый|прил.|2
+死|si3|умирать; мертвый|гл./прил.|4
+住|zhu4|жить; закрепиться|гл.|1
+问|wen4|спрашивать|гл.|1
+医生|yi4 sheng1|врач, доктор|сущ.|1
+同意|tong2 yi4|соглашаться|гл.|3
+对了|dui4 le0|да, кстати||0
+炒|chao3|жарить|гл.|5
+菜|cai4|овощи, блюдо|сущ.|1
+面条儿|mian4 tiao2 er0|лапша|сущ.|1
+病人|bing4 ren2|больной, пациент|сущ.|3
+身体|shen1 ti3|тело, здоровье|сущ.|2
+药|yao4|лекарство|сущ.|2
+烤|kao3|жарить на огне|гл.|0
+炸|zha2|жарить во фритюре|гл.|0
+鸡肉|ji1 rou4|куриное мясо|сущ.|0
+汉堡王|han4 bao3 wang2|Бургер Кинг|сущ.|0
+肯德基|ken3 de2 ji1|KFC|сущ.|0
+汉堡|han4 bao3|бургер|сущ.|0
+芝士|zhi1 shi4|сыр|сущ.|0
+芝士汉堡|zhi1 shi4 han4 bao3|чизбургер|сущ.|0
+薯条|shu3 tiao2|картофель фри|сущ.|0
+点菜|dian3 cai4|заказывать блюда||0
+汽水|qi4 shui3|газировка|сущ.|0
+雪碧|xue3 bi4|Sprite|сущ.|0
+七喜|qi1 xi3|7-Up|сущ.|0
+芬达|fen1 da2|Fanta|сущ.|0
+美年达|mei3 nian2 da2|Mirinda|сущ.|0
+无糖|wu2 tang2|без сахара|прил.|0
+看医生|kan4 yi1 sheng1|сходить к врачу||0
+生病|sheng1 bing4|заболевать|гл.|0
+快餐|kuai4 can1|фаст-фуд|сущ.|0`)};
+const XB=mk(`日本|ri4 ben3|Япония|страна|0
+日本人|ri4 ben3 ren2|японец|сущ.|0
+中国|zhong1 guo2|Китай|страна|0
+北京|bei3 jing1|Пекин|город|0
+清华大学|qing1 hua2 da4 xue2|университет Цинхуа|сущ.|0
+本科生|ben3 ke1 sheng1|студент бакалавриата|сущ.|0
+法国|fa3 guo2|Франция|страна|0
+周|zhou1|неделя|сущ.|0
+星期|xing1 qi1|неделя|сущ.|0
+可乐|ke3 le4|кола|сущ.|0
+百事可乐|bai3 shi4 ke3 le4|пепси-кола|сущ.|0
+吐|tu4|тошнить, рвать|гл.|0
+国外|guo2 wai4|заграница|сущ.|0
+留学|liu2 xue2|учиться за границей|гл.|0
+西班牙|xi1 ban1 ya2|Испания|страна|0
+巴西|ba1 xi1|Бразилия|страна|0
+苹果|ping2 guo3|яблоко|сущ.|0
+苹果手机|ping2 guo3 shou3 ji1|айфон|сущ.|0
+过生日|guo4 sheng1 ri4|праздновать день рождения|гл.|0
+奇怪|qi2 guai4|странный|прил.|0
+祝|zhu4|поздравлять, желать|гл.|0
+碗|wan3|чашка, миска|сущ.|0
+饭馆|fan4 guan3|кафе, ресторанчик|сущ.|0
+种类|zhong3 lei4|разновидность, тип|сущ.|0
+难|nan2|трудный|прил.|0
+过期|guo4 qi1|просрочить|гл.|0
+迟到|chi2 dao4|опаздывать|гл.|0
+肉|rou4|мясо|сущ.|0
+休息|xiu1 xi0|отдыхать|гл.|0
+重|zhong4|тяжёлый|прил.|0
+塑料袋|su4 liao4 dai4|пластиковый пакет|сущ.|0
+街|jie1|улица|сущ.|0
+讲|jiang3|говорить, рассказывать|гл.|0
+俄罗斯|e2 luo2 si1|Россия|страна|0
+英国|ying1 guo2|Англия, Великобритания|страна|0
+德国|de2 guo2|Германия|страна|0
+意大利|yi4 da4 li4|Италия|страна|0
+白俄罗斯|bai2 e2 luo2 si1|Белоруссия|страна|0
+土耳其|tu3 er3 qi2|Турция|страна|0
+美国|mei3 guo2|США|страна|0
+韩国|han2 guo2|Южная Корея|страна|0
+朝鲜|chao2 xian3|Северная Корея|страна|0
+加拿大|jia1 na2 da4|Канада|страна|0
+澳大利亚|ao4 da4 li4 ya4|Австралия|страна|0
+印度|yin4 du4|Индия|страна|0
+泰国|tai4 guo2|Таиланд|страна|0
+越南|yue4 nan2|Вьетнам|страна|0
+蒙古|meng3 gu3|Монголия|страна|0
+哈萨克斯坦|ha1 sa4 ke4 si1 tan3|Казахстан|страна|0
+乌克兰|wu1 ke4 lan2|Украина|страна|0
+红|hong2|красный|цвет|0
+紫|zi3|фиолетовый|цвет|0
+棕|zong1|коричневый|цвет|0
+橙|cheng2|оранжевый|цвет|0
+粉红|fen3 hong2|розовый|цвет|0
+金色|jin1 se4|золотой|цвет|0
+银色|yin2 se4|серебряный|цвет|0
+色|se4|цвет, оттенок|сущ.|0
+香蕉|xiang1 jiao1|банан|сущ.|0
+葡萄|pu2 tao0|виноград|сущ.|0
+西瓜|xi1 gua1|арбуз|сущ.|0
+可可|ke3 ke3|какао|сущ.|0
+零|ling2|ноль|число|0
+二|er4|два|число|0
+三|san1|три|число|0
+四|si4|четыре|число|0
+五|wu3|пять|число|0
+七|qi1|семь|число|0`);
+XB.forEach(w=>{if(!X.some(x=>x.h===w.h))X.push(w)});sv();
+const lw=n=>n=="x"?X:(LW[n]||[]);
+const lr=w=>(P[w.h]&&P[w.h].s>=2);
+const LV=[150,300,600,1200];
+let L,i,sc,wr,tone,done,self,pyOk,hzOk,mixed=true;
+function home(){
+ let all=[];for(let n=1;n<=20;n++)all=all.concat(lw(n));all=all.concat(X);
+ const k=all.filter(lr).length;let v=0;LV.forEach((t,j)=>{if(k>=t)v=j+1});const nx=LV[v],pc=v<4?Math.round(k/nx*100):100;
+ const ls=T.slice(0,20).map((t,j)=>{const n=j+1,w=lw(n),d=w.filter(lr).length;return w.length?`<button class="b ls" onclick="go(lw(${n}))"><span><b>${n}.</b> ${t}</span><small>${d}/${w.length}</small></button>`:`<div class="b ls dis"><span><b>${n}.</b> ${t}</span><small>слов пока нет</small></div>`}).join("");
+ $.innerHTML=`<h1>Тренажёр иероглифов 汉字</h1>
+ <div class="hs"><b>Выучено слов: ${k} из ${all.length}</b><div class="pb"><i style="width:${all.length?Math.round(k/all.length*100):0}%"></i></div><small>Слово считается выученным после двух верных ответов подряд.</small></div>
+ <button class="b p" onclick="numHome()">🔢 Тренажёр чисел</button>
+ <label><input type="checkbox" id="mx" ${mixed?"checked":""}> Перемешать слова</label>
+ <button class="b p" onclick="go(all0())">Все слова</button><button class="b" onclick="go(all0().filter(w=>!lr(w)))">Только невыученные</button>
+ ${ls}
+ <div class="hs"><b>Доп. слова${X.length?" ("+X.length+")":""}</b>${X.length?`<button class="b ls" onclick="go(X)"><span>Тренировать</span><small>${X.filter(lr).length}/${X.length}</small></button>`:""}
+ <input type="text" id="xh" placeholder="Иероглифы"><input type="text" id="xp" placeholder="Пиньинь с цифрами тонов: xi2 guan4" autocapitalize="off"><input type="text" id="xr" placeholder="Перевод"><button class="b" onclick="addX()">Добавить</button><small id="xm"></small></div>
+ <button class="b" id="rs" onclick="rst()">Сбросить прогресс</button>`}
+function all0(){let a=[];for(let n=1;n<=20;n++)a=a.concat(lw(n));return a.concat(X)}
+function addX(){const h=document.getElementById("xh").value.trim(),p=document.getElementById("xp").value.trim().toLowerCase().split(/\s+/),r=document.getElementById("xr").value.trim(),m=document.getElementById("xm");
+ if(!h||!r||p.length!=[...h].length||!p.every(x=>/^[a-z]+[0-4]$/.test(x))){m.textContent="Проверь: слогов должно быть столько же, сколько иероглифов, у каждого цифра тона 0–4.";return}
+ X.push({h,s:p,ru:r,pos:"доп."});sv();home()}
+function rst(){const b=document.getElementById("rs");if(b.dataset.a){P={};sv();home()}else{b.dataset.a=1;b.textContent="Нажми ещё раз — весь прогресс будет стёрт"}}
+function go(list){const c=document.getElementById("mx");if(c)mixed=c.checked;L=mixed?sh(list):list.slice();i=0;sc=0;wr=[];show()}
+function show(){
+ const w=L[i];tone=w.s.map(()=>null);done=false;self=false;
+ $.innerHTML=`<div class="m"><span>${i+1} / ${L.length}</span><span>верно: ${sc}</span></div><div class="bar"><i style="width:${i/L.length*100}%"></i></div>
+ <div class="q">${w.ru}</div><div class="m"><span>${w.pos||"выражение"}</span><span>слогов: ${w.s.length}</span></div>
+ <input type="text" id="hz" class="hz" placeholder="Иероглиф — впиши здесь или нарисуй ниже" autocomplete="off">
+ <canvas id="cv"></canvas><button class="b" onclick="clr()">Очистить рисунок</button>
+ ${w.s.map((_,k)=>`<div class="sy"><input type="text" class="py" placeholder="пиньинь, слог ${k+1} (например, xi)" autocapitalize="off" autocorrect="off" spellcheck="false"><div class="tn">${[0,1,2,3,4].map(t=>`<button data-k="${k}" data-t="${t}">${t}</button>`).join("")}</div></div>`).join("")}
+ <div id="fb"></div><button class="b p" id="ck" onclick="check()">Проверить</button>`;
+ document.querySelectorAll(".tn button").forEach(b=>b.onclick=()=>{if(done)return;const k=+b.dataset.k;tone[k]=+b.dataset.t;document.querySelectorAll(`.tn button[data-k="${k}"]`).forEach(x=>x.classList.toggle("on",x===b))});
+ initCv()}
+let cv,cx,dr=false;
+function initCv(){cv=document.getElementById("cv");const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;cx=cv.getContext("2d");cx.scale(d,d);cx.lineWidth=5;cx.lineCap="round";cx.lineJoin="round";cx.strokeStyle=getComputedStyle(document.body).color;
+ const pt=e=>{const q=cv.getBoundingClientRect();return[e.clientX-q.left,e.clientY-q.top]};
+ cv.onpointerdown=e=>{dr=true;cv.setPointerCapture(e.pointerId);const[x,y]=pt(e);cx.beginPath();cx.moveTo(x,y);cx.lineTo(x+.1,y+.1);cx.stroke()};
+ cv.onpointermove=e=>{if(!dr)return;const[x,y]=pt(e);cx.lineTo(x,y);cx.stroke()};
+ cv.onpointerup=cv.onpointercancel=()=>{dr=false}}
+function clr(){cx.clearRect(0,0,cv.width,cv.height)}
+function check(){
+ const w=L[i],ins=[...document.querySelectorAll(".py")];done=true;
+ const typed=document.getElementById("hz").value.replace(/\s/g,"");
+ hzOk=typed?typed===w.h:null;
+ pyOk=w.s.every((s,k)=>{const m=ins[k].value.trim().toLowerCase().replace(/ü/g,"v").match(/^([a-z]+)([0-4])?$/);if(!m)return false;const t=tone[k]!==null?tone[k]:(m[2]!==undefined?+m[2]:null);return m[1]===s.slice(0,-1)&&t===+s.slice(-1)});
+ ins.forEach(x=>x.disabled=true);document.getElementById("hz").disabled=true;
+ const ans=w.s.map(mark).join(" ");
+ document.getElementById("fb").innerHTML=`<div class="r ${pyOk?"ok":"no"}">Пиньинь и тоны: ${pyOk?"верно ✓":"есть ошибка ✗"}<br><b>${ans}</b> <small>(${w.s.join(" ")})</small></div>
+ <div class="r ${hzOk===true?"ok":hzOk===false?"no":""}" ${hzOk===null?'style="border:1px solid var(--bd)"':""}>Иероглиф: <span class="big">${w.h}</span> ${hzOk===true?"✓":hzOk===false?"✗":""}
+ ${hzOk===null?`<br><small>Сравни со своим рисунком.</small><button class="b" id="sf" onclick="tg()">Рисунок верный: нет</button>`:""}</div>`;
+ const c=document.getElementById("ck");c.textContent=i+1<L.length?"Дальше":"Результат";c.onclick=nx}
+function tg(){self=!self;document.getElementById("sf").textContent="Рисунок верный: "+(self?"да":"нет")}
+function nx(){const ok=pyOk&&(hzOk===null?self:hzOk),w=L[i],q=P[w.h]||{s:0};q.s=ok?q.s+1:0;P[w.h]=q;sv();if(ok)sc++;else wr.push(L[i]);i++;i<L.length?show():end()}
+function end(){$.innerHTML=`<h1>Результат: ${sc} из ${L.length}</h1>${wr.length?`<p>Повтори эти слова:</p>`+wr.map(w=>`<div class="r no"><span class="big">${w.h}</span> ${w.s.map(mark).join(" ")}<br>${w.ru}</div>`).join("")+`<button class="b p" onclick="go(wr.slice())">Повторить ошибки</button>`:`<p>Без ошибок! 🎉</p>`}<button class="b" onclick="home()">В начало</button>`}
+
+/* ===== Тренажёр чисел ===== */
+const CH=["零","一","二","三","四","五","六","七","八","九"];
+const PY={零:"ling2",一:"yi1",二:"er4",两:"liang3",三:"san1",四:"si4",五:"wu3",六:"liu4",七:"qi1",八:"ba1",九:"jiu3",十:"shi2",百:"bai3",千:"qian1"};
+const U1=["","один","два","три","четыре","пять","шесть","семь","восемь","девять"];
+const TE=["десять","одиннадцать","двенадцать","тринадцать","четырнадцать","пятнадцать","шестнадцать","семнадцать","восемнадцать","девятнадцать"];
+const TY=["","","двадцать","тридцать","сорок","пятьдесят","шестьдесят","семьдесят","восемьдесят","девяносто"];
+const HU=["","сто","двести","триста","четыреста","пятьсот","шестьсот","семьсот","восемьсот","девятьсот"];
+function ruWords(n){const t=Math.floor(n/1000),h=Math.floor(n/100)%10,r=n%100;
+ const th=t==1?"одна тысяча":t==2?"две тысячи":t==3?"три тысячи":t==4?"четыре тысячи":U1[t]+" тысяч";
+ const rest=r<10?U1[r]:r<20?TE[r-10]:TY[Math.floor(r/10)]+(r%10?" "+U1[r%10]:"");
+ return[th,HU[h],rest].filter(Boolean).join(" ")}
+function zhVariants(n){const d=[...String(n)].map(Number),t=[];
+ t.push(d[0]==2?["两","二"]:[CH[d[0]]]);t.push(["千"]);
+ if(d[1]){t.push(d[1]==2?["两","二"]:[CH[d[1]]]);t.push(["百"])}
+ if(d[2]){if(!d[1])t.push(["零"]);t.push([CH[d[2]]]);t.push(["十"])}else if(d[3])t.push(["零"]);
+ if(d[3])t.push([CH[d[3]]]);
+ let v=[[]];t.forEach(o=>{v=v.flatMap(a=>o.map(x=>[...a,x]))});return v}
+let ND="cz",NS="d",nN=0,nOk=0,nTot=0,nDone=false;
+function numHome(){nOk=0;nTot=0;nNew()}
+function nNew(){nN=1000+Math.floor(Math.random()*9000);nDone=false;nShow()}
+function nSet(x){ND=x;nNew()}
+function nStyle(x){NS=x;nNew()}
+function nShow(){
+ const v=zhVariants(nN)[0],cz=ND=="cz";
+ const q=cz?`<div class="big" style="margin:14px 0 6px">${v.join("")}</div><button class="b" onclick="nHint()">Показать пиньинь</button><div id="nhint"></div>`
+  :NS=="d"?`<div class="big" style="margin:14px 0">${nN}</div>`:`<div class="q" style="margin:14px 0">${ruWords(nN)}</div>`;
+ $.innerHTML=`<div class="m"><span><b>Тренажёр чисел</b></span><span>верно: ${nOk} из ${nTot}</span></div>
+ <div class="tn" style="margin:10px 0"><button class="${cz?"on":""}" onclick="nSet('cz')">Кит → рус</button><button class="${cz?"":"on"}" onclick="nSet('zc')">Рус → кит</button></div>
+ ${cz?"":`<div class="tn" style="margin-bottom:6px"><button class="${NS=="d"?"on":""}" onclick="nStyle('d')">Цифрами</button><button class="${NS=="w"?"on":""}" onclick="nStyle('w')">Словами</button></div>`}
+ ${q}
+ <input type="text" id="na" placeholder="${cz?"Число цифрами":"Иероглифы или пиньинь (yi1 qian1 …)"}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+ <div id="nfb"></div><button class="b p" id="nb" onclick="nCheck()">Проверить</button><button class="b" onclick="home()">В начало</button>`;
+ const a=document.getElementById("na");a.onkeydown=e=>{if(e.key=="Enter")nDone?nNew():nCheck()};a.focus()}
+function nHint(){const v=zhVariants(nN)[0];document.getElementById("nhint").innerHTML=`<div class="r" style="border:1px solid var(--bd)">${v.map(c=>mark(PY[c])).join(" ")}</div>`}
+function nCheck(){
+ if(nDone)return;const a=document.getElementById("na"),raw=a.value.trim();if(!raw)return;
+ const vs=zhVariants(nN);let ok=false,note="";
+ if(ND=="cz"){ok=raw.replace(/[\s,.]/g,"")===String(nN)}
+ else if(/[\u4e00-\u9fff]/.test(raw)){const t=raw.replace(/\s/g,"");ok=vs.some(x=>x.join("")===t)}
+ else{let s=raw.toLowerCase().replace(/[\s'’\-]/g,"").replace(/ü/g,"v");
+  s=s.replace(/([a-z]+)([0-5])/g,(m,b,t)=>mark(b+(t==5?0:t)));
+  ok=vs.some(x=>x.map(c=>mark(PY[c])).join("")===s);
+  if(!ok&&/^[a-z]+$/.test(s)&&vs.some(x=>x.map(c=>PY[c].slice(0,-1)).join("")===s)){ok=true;note="тоны не проверены"}}
+ nTot++;if(ok)nOk++;nDone=true;a.disabled=true;
+ const v=vs[0],alt=vs.length>1?`<br><small>Допустимо также: ${vs.slice(1).map(x=>x.join("")).join(" / ")}</small>`:"";
+ document.getElementById("nfb").innerHTML=`<div class="r ${ok?"ok":"no"}">${ok?"Верно ✓":"Неверно ✗"}${note?" <small>("+note+")</small>":""}<br><b>${nN}</b> — ${ruWords(nN)}<br><span class="big">${v.join("")}</span><br>${v.map(c=>mark(PY[c])).join(" ")}${alt}</div>`;
+ const b=document.getElementById("nb");b.textContent="Дальше";b.onclick=nNew}
+home();
+</script></body></html>
