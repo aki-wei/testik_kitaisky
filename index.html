@@ -33,10 +33,6 @@ small{color:var(--mu)}
 .row{display:flex;gap:8px;align-items:center}
 .row>.b{flex:1;margin:0}
 .arrow{font-size:20px;color:var(--mu);margin:0 6px}
-.ansbox{flex:1;border:1px solid var(--bd);border-radius:10px;padding:10px;background:var(--card)}
-.ansbox.ok{border-color:var(--ok);background:var(--okb)}
-.ansbox.no{border-color:var(--no);background:var(--nob)}
-.res{display:flex;gap:8px;align-items:stretch;margin:8px 0}
 .tiny{font-size:13px;color:var(--mu)}
 .inpwrap{display:flex;align-items:flex-start;gap:6px}
 .inpwrap input{flex:1}
@@ -78,6 +74,18 @@ canvas{width:100%;height:170px;min-height:80px;background:var(--card);border:1px
 .uploadLbl{display:block;text-align:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;cursor:pointer;margin:0;color:var(--tx)}
 .tn button{flex:1;padding:9px 0;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx)}
 .tn .on{background:var(--ac)!important;color:#fff!important;border-color:var(--ac)!important}
+.navrow{display:flex;gap:6px;justify-content:flex-end;margin:2px 0 8px}
+.navrow button{border:1px solid var(--bd);background:var(--card);border-radius:9px;padding:6px 10px;font-size:14px;color:var(--mu)}
+.navrow button:disabled{opacity:.4}
+.resultbox{display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--bd);border-radius:10px;margin:4px 0;background:var(--card);box-sizing:border-box;min-height:46px;width:100%}
+.resultbox.ok{border-color:var(--ok);background:var(--okb)}
+.resultbox.no{border-color:var(--no);background:var(--nob)}
+.resultbox .big{font-size:22px}
+.resultbox .ans{text-decoration:line-through;opacity:.8}
+.resultbox .arrow{font-size:18px;color:var(--mu)}
+.resultbox .right{font-weight:700}
+.resultbox .yes{color:var(--ok);font-weight:700;margin-left:auto}
+.resultbox .no-mark{color:var(--no);font-weight:700;margin-left:auto}
 </style></head><body><div id="app"></div>
 
 <script type="module">
@@ -131,7 +139,7 @@ window.__startApp = function(){
   const $=document.getElementById("app");
   const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 
-  let P={},X=[],R=[],HIDE={hz:false,cv:false},ZOOM=170,SEL=new Set(),CUSTOM=[];
+  let P={},X=[],HIDE={hz:false,cv:false},ZOOM=170,SEL=new Set(),CUSTOM=[];
   let mixed=true;
   let CURRENT_USER=null;
   let CURRENT_AVATAR="";
@@ -146,7 +154,7 @@ window.__startApp = function(){
       try{
         await window.FB.setDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid),{
           avatar: CURRENT_AVATAR, nick: CURRENT_NICK,
-          data: { P, X, R, HIDE, ZOOM, SEL:[...SEL], CUSTOM, autosort: !!window.__autosort, updatedAt: Date.now() }
+          data: { P, X, HIDE, ZOOM, SEL:[...SEL], CUSTOM, autosort: !!window.__autosort, updatedAt: Date.now() }
         }, {merge:true});
       }catch(e){console.warn("save error",e)}
     },500);
@@ -159,14 +167,14 @@ window.__startApp = function(){
         CURRENT_AVATAR=obj.avatar||"";
         CURRENT_NICK=obj.nick||"";
         const d=obj.data||{};
-        P=d.P||{}; X=d.X||[]; R=d.R||[];
+        P=d.P||{}; X=d.X||[];
         HIDE=Object.assign({hz:false,cv:false},d.HIDE||{});
         ZOOM=+d.ZOOM||170;
         SEL=new Set(d.SEL||[]);
         CUSTOM=d.CUSTOM||[];
         window.__autosort=!!d.autosort;
       }else{
-        P={};X=[];R=[];HIDE={hz:false,cv:false};ZOOM=170;SEL=new Set();CUSTOM=[];
+        P={};X=[];HIDE={hz:false,cv:false};ZOOM=170;SEL=new Set();CUSTOM=[];
         window.__autosort=false;
         await sv();
       }
@@ -894,7 +902,7 @@ window.__startApp = function(){
 
   const lr=w=>(P[w.h]&&P[w.h].s>=2);
   const LV=[150,300,600,1200];
-  let L=[],i=0,sc=0,wr=[],done=false,self=null,fromRepeat=false;
+  let L=[],i=0,sc=0,wr=[],done=false,self=null;
   let HISTORY=[];
   let cv,cx,dr=false,cvReady=false;
   function selKeyBase(n){return "b"+n}
@@ -959,7 +967,7 @@ window.__startApp = function(){
       CURRENT_NICK="";
       await window.FB.setDoc(window.FB.doc(window.FB.db,"users",cred.user.uid),{
         avatar: CURRENT_AVATAR, nick: CURRENT_NICK,
-        data: {P:{},X:[],R:[],HIDE:{hz:false,cv:false},ZOOM:170,SEL:[],CUSTOM:[],autosort:false,updatedAt:Date.now()}
+        data: {P:{},X:[],HIDE:{hz:false,cv:false},ZOOM:170,SEL:[],CUSTOM:[],autosort:false,updatedAt:Date.now()}
       });
     }catch(e){err.textContent=ruErr(e.code||e.message);}
   };
@@ -1088,7 +1096,6 @@ window.__startApp = function(){
         <button onclick="__delBlock('${b.id}')" title="Удалить блок">✕</button></div>`;
     }).join("");
     const ls=rows.join("");
-    const rep=R.length?`<button class="b ls" style="border-color:var(--ac)" onclick="__goRepeat()"><span>🔁 Повторялка</span><small>${R.length}</small></button>`:"";
     const unsorted=myUnsorted();
     const unsortedBlock=`<div class="b ls">
       <label class="chk" style="margin:0;color:var(--tx)">
@@ -1125,7 +1132,6 @@ window.__startApp = function(){
         <button class="b p" style="margin:0" onclick="__goSelected()">Выбранные слова</button>
         <button class="b" style="margin:0" onclick="__markAll()">Отметить все</button></div>
       <div class="tiny" id="selInfo"></div>
-      ${rep}
       ${ls}
       <div class="hs"><b>Мои блоки</b>${blkRows||`<div class="tiny">Блоков пока нет.</div>`}
         <input type="text" id="bn" placeholder="Название нового блока">
@@ -1245,9 +1251,8 @@ window.__startApp = function(){
     return out;
   }
 
-  window.__go=list=>{const c=document.getElementById("mx");if(c)mixed=c.checked;L=mixed?sh(list):list.slice();i=0;sc=0;wr=[];fromRepeat=false;HISTORY=[];window.__show()};
-  window.__goRepeat=()=>{if(!R.length)return;L=R.map(h=>all0().find(w=>w.h===h)||{h,s:[],ru:"?"});i=0;sc=0;wr=[];fromRepeat=true;HISTORY=[];window.__show()};
-
+  window.__go=list=>{const c=document.getElementById("mx");if(c)mixed=c.checked;L=mixed?sh(list):list.slice();i=0;sc=0;wr=[];HISTORY=[];window.__show()};
+  
   function show(){
     const w=L[i];done=false;self=null;
     HISTORY[i]=HISTORY[i]||{hzRaw:"",pyRaw:"",hzOK:null,pyOK:null,pyNoTone:false,ok:null,done:false,self:null};
@@ -1261,16 +1266,12 @@ window.__startApp = function(){
     <div class="q">${w.ru}</div>
     <div class="m"><span>${w.pos||"выражение"}</span><span>слогов: ${w.s.length}</span></div>
 
-    <div class="row" style="margin:4px 0 8px">
-      <button class="b" style="margin:0" ${navDisL} onclick="__back()">← Назад</button>
-      <button class="b" style="margin:0" ${navDisR} onclick="__forward()">Вперёд →</button>
+    <div class="navrow">
+      <button ${navDisL} onclick="__back()">← Назад</button>
+      <button ${navDisR} onclick="__forward()">Вперёд →</button>
     </div>
 
-    <div class="inpwrap" id="hzRow" style="${hzHidden?"display:none":""}">
-      <input type="text" id="hz" class="hz" placeholder="Иероглифы" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-      <button class="mini" title="Скрыть поле иероглифов" onclick="__hideBox('hz',true)">👁</button>
-    </div>
-    ${hzHidden?`<div class="hiddenRow"><button onclick="__hideBox('hz',false)">🙈 Показать поле иероглифов</button></div>`:""}
+    <div id="hzSlot"></div>
 
     <div class="cvrow" id="cvRow" style="${cvHidden?"display:none":""}">
       <div class="cvbox"><canvas id="cv" style="height:${ZOOM}px"></canvas>
@@ -1279,16 +1280,13 @@ window.__startApp = function(){
     <div class="tools" id="cvTools" style="${cvHidden?"display:none":""}"><button onclick="__clr()">Очистить рисунок</button></div>
     ${cvHidden?`<div class="hiddenRow"><button onclick="__hideBox('cv',false)">🙈 Показать окно рисования</button></div>`:""}
 
-    <div class="inpwrap" style="margin-top:6px">
-      <input type="text" id="py" placeholder="Пиньинь: ni3 hao3 / nǐ hǎo / ni hao" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-    </div>
+    <div id="pySlot"></div>
 
     <div id="fb"></div>
     <div class="row" id="actions" style="margin-top:6px"></div>`;
 
-    const hzEl=document.getElementById("hz"),pyEl=document.getElementById("py");
-    if(hzEl)hzEl.value=H.hzRaw||"";
-    if(pyEl)pyEl.value=H.pyRaw||"";
+    paintHzSlot();
+    paintPySlot();
 
     paintActions();
     if(!cvHidden)initCv();else{cv=null;cvReady=false;cx=null}
@@ -1300,6 +1298,38 @@ window.__startApp = function(){
   window.__home=home;
 
   window.__hideBox=(k,on)=>{HIDE[k]=on;sv();show()};
+
+  function paintHzSlot(){
+    const slot=document.getElementById("hzSlot");
+    if(!slot)return;
+    const H=HISTORY[i]||{};
+    if(!H.done){
+      slot.innerHTML=`<div class="inpwrap">
+        <input type="text" id="hz" class="hz" placeholder="Иероглифы" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <button class="mini" title="Скрыть поле иероглифов" onclick="__hideBox('hz',true)">👁</button>
+      </div>`;
+      const hzEl=document.getElementById("hz");
+      if(hzEl)hzEl.value=H.hzRaw||"";
+    }else{
+      slot.innerHTML=renderHzResult();
+    }
+  }
+
+  function paintPySlot(){
+    const slot=document.getElementById("pySlot");
+    if(!slot)return;
+    const H=HISTORY[i]||{};
+    if(!H.done){
+      slot.innerHTML=`<div class="inpwrap" style="margin-top:6px">
+        <input type="text" id="py" placeholder="Пиньинь: ni3 hao3 / nǐ hǎo / ni hao" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+      </div>`;
+      const pyEl=document.getElementById("py");
+      if(pyEl)pyEl.value=H.pyRaw||"";
+    }else{
+      slot.innerHTML=renderPyResult();
+    }
+  }
+
   function paintActions(){
     const a=document.getElementById("actions");
     if(!a)return;
@@ -1307,11 +1337,10 @@ window.__startApp = function(){
     if(!H.done){
       a.innerHTML=`<button class="b p" style="margin:0" onclick="__check()">Проверить</button>`;
     }else{
-      const w=L[i];const inR=R.includes(w.h);
-      a.innerHTML=`<button class="b" style="margin:0" onclick="__toRepeat()" ${inR?"disabled":""}>${inR?"Уже в повторялке":"Закинуть в повторялку"}</button>
-      <button class="b p" style="margin:0" onclick="__nx()">${i+1<L.length?"Дальше":"Результат"}</button>`;
+      a.innerHTML=`<button class="b p" style="margin:0" onclick="__nx()">${i+1<L.length?"Дальше":"Результат"}</button>`;
     }
   }
+  
   function initCv(){
     cv=document.getElementById("cv");
     if(!cv){cvReady=false;return}
@@ -1366,85 +1395,121 @@ window.__startApp = function(){
     paintActions();
   };
 
-  function renderResult(){
+  function renderHzResult(){
     const w=L[i];
     const H=HISTORY[i]||{};
-    const hzEl=document.getElementById("hz"),pyEl=document.getElementById("py");
-    const hzRaw=H.hzRaw||"",pyRaw=H.pyRaw||"";
-    const hzOK=H.hzOK,pyOK=H.pyOK,pyNoTone=H.pyNoTone;
-    const ok=H.ok;
+    const hzRaw=H.hzRaw||"";
+    const hzOK=H.hzOK;
     const drawn=cv&&cvReady&&!HIDE.cv;
+    const H_self=H.self;
 
-    if(hzEl){
-      hzEl.classList.remove("ok","no");
-      if(hzOK===true)hzEl.classList.add("ok");else if(hzOK===false)hzEl.classList.add("no");
-      hzEl.disabled=true;
+    if(drawn && hzOK===null){
+      const boxClass = (H_self===null||H_self===undefined)?"":(H_self?"ok":"no");
+      const btnYes = H_self===true ? "p" : "";
+      const btnNo  = H_self===false ? "no-active" : "";
+      const dis = (H_self===null||H_self===undefined)?"":"disabled";
+      return `<div class="resultbox ${boxClass}" style="border-color:var(--bd);align-items:center">
+        <span class="big">${w.h}</span>
+        <span style="margin-left:auto;display:flex;gap:6px">
+          <button class="b ${btnNo}" style="margin:0;width:auto;padding:6px 10px;${btnNo?'background:var(--no);color:#fff;border-color:var(--no)':''}" ${dis} onclick="__selfAns(false)">Нет</button>
+          <button class="b ${btnYes}" style="margin:0;width:auto;padding:6px 10px;${btnYes?'background:var(--ac);color:#fff;border-color:var(--ac)':''}" ${dis} onclick="__selfAns(true)">Верно</button>
+        </span>
+      </div>`;
     }
-    if(pyEl){
-      pyEl.classList.remove("ok","no");
-      if(pyOK===true)pyEl.classList.add("ok");else if(pyOK===false)pyEl.classList.add("no");
-      pyEl.disabled=true;
-    }
 
-    let fb="";
-
-    if(hzOK!==null || drawn){
-      const showSelfRow = drawn && hzOK===null;
-      if(showSelfRow){
-        fb+=`<div class="res" style="align-items:center">
-          <div class="ansbox" style="flex:1">
-            <small>Иероглиф (рисунок)</small><br>
-            <span class="big">${w.h}</span>
-          </div>
-          <button class="b" style="margin:0;width:auto;padding:8px 12px" onclick="__selfAns(false)">Нет</button>
-          <button class="b p" style="margin:0;width:auto;padding:8px 12px" onclick="__selfAns(true)">Верно</button>
+    if(hzOK!==null){
+      if(hzOK===true){
+        return `<div class="resultbox ok">
+          <span class="big">${normHz(hzRaw)}</span><span class="yes">✓</span>
         </div>`;
       }else{
-        fb+=`<div class="ansbox ${hzOK===true?"ok":hzOK===false?"no":""}" style="margin:6px 0">
-          <small>Иероглифы</small><br>
-          ${hzRaw.trim()?`<span style="text-decoration:${hzOK===false?"line-through":"none"}">${normHz(hzRaw)}</span>`:`<span class="tiny">—</span>`}
-          ${hzOK===false?`<span class="arrow">→</span><b>${w.h}</b>`:""}
-          ${hzOK===true?" ✓":""}
+        return `<div class="resultbox no">
+          <span class="big ans">${normHz(hzRaw)||"—"}</span>
+          <span class="arrow">→</span>
+          <span class="big right">${w.h}</span>
         </div>`;
       }
     }
 
-    if(pyOK!==null || (pyRaw.trim()===""&&!drawn)){
-      fb+=`<div class="ansbox ${pyOK===true?"ok":pyOK===false?"no":""}" style="margin:6px 0">
-        <small>Пиньинь</small><br>
-        ${pyRaw.trim()?`<span style="text-decoration:${pyOK===false?"line-through":"none"}">${pyRaw.trim()}</span>`:`<span class="tiny">—</span>`}
-        ${pyOK!==true?`<span class="arrow">→</span><b>${w.s.map(mark).join(" ")}</b>`:""}
-        ${pyOK===true?(pyNoTone?" ✓ (тоны не проверены)":" ✓"):""}
+    if(!drawn){
+      return `<div class="resultbox">
+        <span class="big right">${w.h}</span>
       </div>`;
     }
 
-    if(H.done && hzOK===null && pyOK===null && !drawn){
-      fb=`<div class="ansbox" style="margin:6px 0">
-        <small>Правильный ответ</small><br>
-        <b>${w.h}</b> — ${w.s.map(mark).join(" ")}
+    return `<div class="resultbox"><span class="big">${w.h}</span></div>`;
+  }
+
+  function renderPyResult(){
+    const w=L[i];
+    const H=HISTORY[i]||{};
+    const pyRaw=H.pyRaw||"";
+    const pyOK=H.pyOK;
+    const pyNoTone=H.pyNoTone;
+    const pyRight=w.s.map(mark).join(" ");
+
+    if(pyOK!==null){
+      if(pyOK===true){
+        return `<div class="resultbox ok" style="margin-top:6px">
+          <span class="big">${pyRaw.trim()||"—"}</span>
+          <span class="yes">✓${pyNoTone?" (тоны не проверены)":""}</span>
+        </div>`;
+      }else{
+        return `<div class="resultbox no" style="margin-top:6px">
+          <span class="big ans">${pyRaw.trim()||"—"}</span>
+          <span class="arrow">→</span>
+          <span class="big right">${pyRight}</span>
+        </div>`;
+      }
+    }
+
+    if(pyRaw.trim()===""){
+      return `<div class="resultbox" style="margin-top:6px">
+        <span class="big right">${pyRight}</span>
       </div>`;
     }
 
-    if(ok===true) fb+=`<div class="r ok" style="margin:6px 0">Верно ✓</div>`;
-    else if(ok===false) fb+=`<div class="r no" style="margin:6px 0">Неверно ✗</div>`;
+    return `<div class="resultbox" style="margin-top:6px"><span class="big">${pyRight}</span></div>`;
+  }
 
-    document.getElementById("fb").innerHTML=fb;
+  function renderResult(){
+    const slotHz=document.getElementById("hzSlot");
+    const slotPy=document.getElementById("pySlot");
+    if(slotHz)slotHz.innerHTML=renderHzResult();
+    if(slotPy)slotPy.innerHTML=renderPyResult();
+
+    const H=HISTORY[i]||{};
+    const fb=document.getElementById("fb");
+    if(fb){
+      if(H.ok===true) fb.innerHTML=`<div class="r ok" style="margin:6px 0">Верно ✓</div>`;
+      else if(H.ok===false) fb.innerHTML=`<div class="r no" style="margin:6px 0">Неверно ✗</div>`;
+      else fb.innerHTML="";
+    }
   }
 
   window.__selfAns=v=>{
     const w=L[i];
     const H=HISTORY[i]||{};
     const ok=(v===true);
-    const q=P[w.h]||{s:0};q.s=ok?q.s+1:0;P[w.h]=q;
-    if(ok)sc++;else wr.push(w);
+    const prev=H.self;
+    
+    const q=P[w.h]||{s:0};
+    if(ok){ q.s=Math.min(2,(q.s||0)+1); } else { q.s=0; }
+    P[w.h]=q;
+
+    const wasOk = (prev===true);
+    if(wasOk && !ok) sc--;
+    if(!wasOk && ok) sc++;
+
+    wr = wr.filter(x=>x.h!==w.h);
+    if(!ok) wr.push(w);
+
     H.self=v;H.ok=ok;H.done=true;
     HISTORY[i]=H;
     sv();
     renderResult();
-    paintActions();
-    document.querySelectorAll("#fb button").forEach(b=>b.disabled=true);
   };
-  window.__toRepeat=()=>{const w=L[i];if(!R.includes(w.h)){R.push(w.h);sv()}paintActions()};
+
   window.__nx=()=>{
     const w=L[i];
     const H=HISTORY[i];
@@ -1454,12 +1519,11 @@ window.__startApp = function(){
         const q=P[w.h]||{s:0};q.s=0;P[w.h]=q;wr.push(w);H.self=false;
       }else{
         const ok=(H.hzOK!==false)&&(H.pyOK!==false)&&(H.hzOK!==null||H.pyOK!==null);
-        const q=P[w.h]||{s:0};q.s=ok?q.s+1:0;P[w.h]=q;
+        const q=P[w.h]||{s:0};q.s=ok?Math.min(2,q.s+1):0;P[w.h]=q;
         if(ok)sc++;else wr.push(w);
         H.self=ok;
       }
       sv();
-      if(H.self&&fromRepeat){R=R.filter(h=>h!==w.h);sv()}
     }
     i++;
     if(i<L.length)window.__show();else end();
@@ -1468,8 +1532,20 @@ window.__startApp = function(){
   window.__forward=()=>{if(i>=L.length-1)return;i++;window.__show()};
 
   function end(){
-    $.innerHTML=`<h1>Результат: ${sc} из ${L.length}</h1>${wr.length?`<p>Повтори эти слова:</p>`+wr.map(w=>`<div class="r no"><span class="big">${w.h}</span> ${w.s.map(mark).join(" ")}<br>${w.ru}</div>`).join("")+`<button class="b p" onclick="__go(wr.slice())">Повторить ошибки</button>`:`<p>Без ошибок! 🎉</p>`}<button class="b" onclick="__home()">В начало</button>`;
+    const wrongList = wr.slice();
+    $.innerHTML=`<h1>Результат: ${sc} из ${L.length}</h1>
+      ${wrongList.length?
+        `<p>Повтори эти слова:</p>`+
+        wrongList.map(w=>`<div class="r no"><span class="big">${w.h}</span> ${w.s.map(mark).join(" ")}<br>${w.ru}</div>`).join("")+
+        `<button class="b p" onclick="__retryWrong()">Повторить ошибки</button>`
+        :`<p>Без ошибок! 🎉</p>`}
+      <button class="b" onclick="__home()">В начало</button>`;
   }
+
+  window.__retryWrong=()=>{
+    if(!wr.length){alert("Ошибок нет!");return}
+    window.__go(wr.slice());
+  };
 
   const CH=["零","一","二","三","四","五","六","七","八","九"];
   const PY={零:"ling2",一:"yi1",二:"er4",两:"liang3",三:"san1",四:"si4",五:"wu3",六:"liu4",七:"qi1",八:"ba1",九:"jiu3",十:"shi2",百:"bai3",千:"qian1"};
