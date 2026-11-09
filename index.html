@@ -13,29 +13,85 @@ h1{font-size:22px;margin:8px 0 4px}p{color:var(--mu);margin:4px 0 12px}
 button,input{font:inherit;color:inherit}button{cursor:pointer}
 .b{display:block;width:100%;text-align:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:8px 0}
 .p{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
-input[type=text]{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px;margin:4px 0}
+input[type=text]{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px;margin:4px 0;transition:border-color .15s,background .15s}
+input[type=text].ok{border-color:var(--ok);background:var(--okb)}
+input[type=text].no{border-color:var(--no);background:var(--nob)}
 .hz{font-size:24px}
 .m{color:var(--mu);font-size:14px;display:flex;justify-content:space-between}
 .bar{height:6px;background:var(--bd);border-radius:3px;margin:8px 0 14px}.bar i{display:block;height:100%;background:var(--ac);border-radius:3px}
 .q{font-size:21px;font-weight:600;margin:6px 0 2px}
-canvas{width:100%;height:170px;background:var(--card);border:1px dashed var(--bd);border-radius:12px;touch-action:none;display:block}
+canvas{width:100%;height:170px;background:var(--card);border:1px dashed var(--bd);border-radius:12px;touch-action:none;display:block;transition:height .15s}
 .sy{margin:8px 0}.tn{display:flex;gap:6px}.tn button{flex:1;padding:9px 0;border:1px solid var(--bd);border-radius:10px;background:var(--card)}
 .tn .on{background:var(--ac);color:#fff;border-color:var(--ac)}
 .r{border-radius:12px;padding:10px 12px;margin:8px 0}.ok{background:var(--okb)}.no{background:var(--nob)}
 .big{font-size:34px}
-.ls{display:flex;justify-content:space-between;gap:8px;text-align:left}.ls small{white-space:nowrap}.dis{opacity:.45}.hs{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:10px 0}.pb{height:8px;background:var(--bd);border-radius:4px;margin:6px 0}.pb i{display:block;height:100%;background:var(--ok);border-radius:4px}label{display:block;margin:10px 0;color:var(--mu)}
+.ls{display:flex;justify-content:space-between;gap:8px;text-align:left}.ls small{white-space:nowrap}.dis{opacity:.45}
+.hs{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:10px 0}
+.pb{height:8px;background:var(--bd);border-radius:4px;margin:6px 0}.pb i{display:block;height:100%;background:var(--ok);border-radius:4px}
+label{display:block;margin:10px 0;color:var(--mu)}
 small{color:var(--mu)}
+.row{display:flex;gap:8px;align-items:center}
+.row>.b{flex:1;margin:0}
+.arrow{font-size:20px;color:var(--mu);margin:0 6px}
+.ansbox{flex:1;border:1px solid var(--bd);border-radius:10px;padding:10px;background:var(--card)}
+.ansbox.ok{border-color:var(--ok);background:var(--okb)}
+.ansbox.no{border-color:var(--no);background:var(--nob)}
+.res{display:flex;gap:8px;align-items:stretch;margin:8px 0}
+.res input{flex:1;margin:0}
+.tools{display:flex;gap:6px;margin:6px 0}
+.tools button{flex:1;padding:8px 0;border:1px solid var(--bd);border-radius:10px;background:var(--card)}
+.tiny{font-size:13px;color:var(--mu)}
 </style></head><body><div id="app"></div>
 <script>
+/* ===================== утилиты ===================== */
 const M={a:"āáǎà",e:"ēéěè",i:"īíǐì",o:"ōóǒò",u:"ūúǔù",v:"ǖǘǚǜ"};
+const RV={};
+for(const b in M){[...M[b]].forEach((ch,k)=>{RV[ch]=b+(k+1)})}
 function mark(s){const t=+s.slice(-1),b=s.slice(0,-1);if(!t)return b;let k=b.search(/[ae]/);if(k<0&&b.includes("ou"))k=b.indexOf("o");if(k<0){for(let j=b.length-1;j>=0;j--)if("iouv".includes(b[j])){k=j;break}}return b.slice(0,k)+M[b[k]][t-1]+b.slice(k+1)}
+
+/* нормализация: убираем пробелы/дефисы/апострофы, тоны-знаки -> цифры, ü->v, 5->0, lower */
+function norm(s){
+  s=String(s).toLowerCase().replace(/[uü]/g,"v");
+  let out="";
+  for(const ch of s){
+    if(RV[ch]){out+=RV[ch]}
+    else if(/[a-z0-9]/.test(ch)){out+=ch}
+    /* всё остальное (пробелы, дефисы, апострофы, иероглифы и пр.) пропускаем */
+  }
+  out=out.replace(/5/g,"0");
+  return out;
+}
+/* иероглифы без пробелов */
+function normHz(s){return String(s).replace(/\s+/g,"")}
+/* содержит ли строка иероглифы */
+function hasHz(s){return /[\u4e00-\u9fff]/.test(s)}
+/* содержит ли строка латиницу/цифры (пиньинь) */
+function hasPy(s){return /[a-zA-Zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü]/.test(s)}
+
 const $=document.getElementById("app");
 const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-let P={},X=[];try{P=JSON.parse(localStorage.getItem("hz1")||"{}");X=JSON.parse(localStorage.getItem("hz1x")||"[]")}catch(e){}
-const sv=()=>{try{localStorage.setItem("hz1",JSON.stringify(P));localStorage.setItem("hz1x",JSON.stringify(X))}catch(e){}};
+
+/* ===================== хранилище ===================== */
+let P={},X=[],R=[],HIDE={},ZOOM=170;
+try{
+  P=JSON.parse(localStorage.getItem("hz1")||"{}");
+  X=JSON.parse(localStorage.getItem("hz1x")||"[]");
+  R=JSON.parse(localStorage.getItem("hz1r")||"[]");
+  HIDE=JSON.parse(localStorage.getItem("hz1hide")||"{}");
+  ZOOM=+localStorage.getItem("hz1zoom")||170;
+}catch(e){}
+const sv=()=>{try{
+  localStorage.setItem("hz1",JSON.stringify(P));
+  localStorage.setItem("hz1x",JSON.stringify(X));
+  localStorage.setItem("hz1r",JSON.stringify(R));
+  localStorage.setItem("hz1hide",JSON.stringify(HIDE));
+  localStorage.setItem("hz1zoom",String(ZOOM));
+}catch(e){}};
+
 const mk=t=>t.split("\n").filter(Boolean).map(l=>{const p=l.split("|");return{h:p[0],s:p[1].split(" "),ru:p[2],pos:p[3],l:+p[4]||0}});
 const T=["你好","你是哪国人","那是你的书吗","图书馆在哪儿","清华大学在哪儿","现在几点","明天你有课吗","你的电话号码是多少","多少钱一本","你家有几口人","北京的冬天比较冷","在干什么呢","我打算去商店买东西","你喜欢什么颜色的","明天是我朋友的生日","周末你干什么","做客（一）","做客（二）","早睡早起比较好啊","看病人","中国朋友太热情了","他感冒了","你学了多长时间汉语","明天见","你得多锻炼锻炼了","快考试了","爸爸妈妈让我回家","考得怎么样","你什么时候去旅行","我要参加联欢会"];
 
+/* ---------- базовые уроки ---------- */
 const LW={1:mk(`你好|ni3 hao3|здравствуйте, привет||1
 好|hao3|хороший|прил.|1
 你|ni3|ты|мест.|1
@@ -459,7 +515,7 @@ const LW={1:mk(`你好|ni3 hao3|здравствуйте, привет||1
 身体|shen1 ti3|тело, здоровье|сущ.|2
 药|yao4|лекарство|сущ.|2`)};
 
-/* ===== Дополнительные слова по урокам ===== */
+/* ---------- доп. слова по урокам ---------- */
 const X18=mk(`故事|gu4 shi4|сказание; сказка; рассказ; история|сущ.|0
 历史|li4 shi3|история; исторический|сущ.|0
 宝贝|bao3 bei4|сокровище, деточка, дорогой|сущ.|0
@@ -701,12 +757,16 @@ const XB=mk(`日本|ri4 ben3|Япония|страна|0
 七|qi1|семь|число|0`);
 XB.forEach(w=>{if(!X.some(x=>x.h===w.h))X.push(w)});sv();
 
-/* группы доп. слов по урокам */
 const XG={18:X18,19:X19a.concat(X19b),20:X20};
 const lw=n=>n=="x"?X:(LW[n]||[]);
 const lr=w=>(P[w.h]&&P[w.h].s>=2);
 const LV=[150,300,600,1200];
-let L,i,sc,wr,tone,done,self,pyOk,hzOk,mixed=true;
+
+/* ===================== состояние сессии ===================== */
+let L=[],i=0,sc=0,wr=[],done=false,self=null,mixed=true,fromRepeat=false;
+let cv,cx,dr=false;
+
+/* ===================== главный экран ===================== */
 function home(){
  let all=[];for(let n=1;n<=20;n++)all=all.concat(lw(n));all=all.concat(X);
  const k=all.filter(lr).length;let v=0;LV.forEach((t,j)=>{if(k>=t)v=j+1});const nx=LV[v],pc=v<4?Math.round(k/nx*100):100;
@@ -714,55 +774,199 @@ function home(){
    if(XG[n]){const d2=XG[n].filter(lr).length;extra=`<br><small style="color:var(--ac)">доп: ${d2}/${XG[n].length}</small>`}
    return w.length?`<button class="b ls" onclick="go(lw(${n}))"><span><b>${n}.</b> ${t}${extra}</span><small>${d}/${w.length}</small></button>`:`<div class="b ls dis"><span><b>${n}.</b> ${t}</span><small>слов пока нет</small></div>`}).join("");
  const xs=[18,19,20].map(n=>{const g=XG[n],d=g.filter(lr).length;return `<button class="b ls" onclick="go(XG[${n}])"><span>Доп. слова к уроку ${n}</span><small>${d}/${g.length}</small></button>`}).join("");
+ const rep=R.length?`<button class="b ls" style="border-color:var(--ac)" onclick="goRepeat()"><span>🔁 Повторялка</span><small>${R.length}</small></button>`:"";
  $.innerHTML=`<h1>Тренажёр иероглифов 汉字</h1>
  <div class="hs"><b>Выучено слов: ${k} из ${all.length}</b><div class="pb"><i style="width:${all.length?Math.round(k/all.length*100):0}%"></i></div><small>Слово считается выученным после двух верных ответов подряд.</small></div>
  <button class="b p" onclick="numHome()">🔢 Тренажёр чисел</button>
  <label><input type="checkbox" id="mx" ${mixed?"checked":""}> Перемешать слова</label>
  <button class="b p" onclick="go(all0())">Все слова</button><button class="b" onclick="go(all0().filter(w=>!lr(w)))">Только невыученные</button>
+ ${rep}
  ${ls}
  <div class="hs"><b>Доп. слова по урокам</b>${xs}</div>
  <div class="hs"><b>Доп. слова${X.length?" ("+X.length+")":""}</b>${X.length?`<button class="b ls" onclick="go(X)"><span>Тренировать</span><small>${X.filter(lr).length}/${X.length}</small></button>`:""}
- <input type="text" id="xh" placeholder="Иероглифы"><input type="text" id="xp" placeholder="Пиньинь с цифрами тонов: xi2 guan4" autocapitalize="off"><input type="text" id="xr" placeholder="Перевод"><button class="b" onclick="addX()">Добавить</button><small id="xm"></small></div>
+ <input type="text" id="xh" placeholder="Иероглифы"><input type="text" id="xp" placeholder="Пиньинь с цифрами: xi2 guan4" autocapitalize="off"><input type="text" id="xr" placeholder="Перевод"><button class="b" onclick="addX()">Добавить</button><small id="xm"></small></div>
+ <div class="hs"><b>Настройки</b>
+ <label><input type="checkbox" id="hH" ${HIDE.hz?"checked":""} onchange="toggleHide('hz',this.checked)"> Скрывать поле для иероглифов</label>
+ <label><input type="checkbox" id="hC" ${HIDE.cv?"checked":""} onchange="toggleHide('cv',this.checked)"> Скрывать окно для рисования</label>
+ <div class="tiny">Масштаб окна рисования: <b id="zv">${ZOOM}px</b> <button class="b" style="display:inline-block;width:auto;padding:4px 10px;margin:0 4px" onclick="zoom(-70)">−</button><button class="b" style="display:inline-block;width:auto;padding:4px 10px;margin:0 4px" onclick="zoom(70)">+</button><button class="b" style="display:inline-block;width:auto;padding:4px 10px;margin:0 4px" onclick="zoom(0)">сброс</button></div>
+ </div>
  <button class="b" id="rs" onclick="rst()">Сбросить прогресс</button>`}
 function all0(){let a=[];for(let n=1;n<=20;n++)a=a.concat(lw(n));return a.concat(X)}
 function addX(){const h=document.getElementById("xh").value.trim(),p=document.getElementById("xp").value.trim().toLowerCase().split(/\s+/),r=document.getElementById("xr").value.trim(),m=document.getElementById("xm");
  if(!h||!r||p.length!=[...h].length||!p.every(x=>/^[a-z]+[0-4]$/.test(x))){m.textContent="Проверь: слогов должно быть столько же, сколько иероглифов, у каждого цифра тона 0–4.";return}
  X.push({h,s:p,ru:r,pos:"доп."});sv();home()}
-function rst(){const b=document.getElementById("rs");if(b.dataset.a){P={};sv();home()}else{b.dataset.a=1;b.textContent="Нажми ещё раз — весь прогресс будет стёрт"}}
-function go(list){const c=document.getElementById("mx");if(c)mixed=c.checked;L=mixed?sh(list):list.slice();i=0;sc=0;wr=[];show()}
+function rst(){const b=document.getElementById("rs");if(b.dataset.a){P={};R=[];sv();home()}else{b.dataset.a=1;b.textContent="Нажми ещё раз — весь прогресс и повторялка будут стёрты"}}
+function toggleHide(k,v){HIDE[k]=v;sv()}
+function zoom(d){ZOOM=d?Math.max(100,Math.min(700,ZOOM+d)):170;sv();const z=document.getElementById("zv");if(z)z.textContent=ZOOM+"px";applyZoom()}
+function applyZoom(){if(cv){const r=cv.getBoundingClientRect();const d=devicePixelRatio||1;cv.style.height=ZOOM+"px";requestAnimationFrame(()=>{const r2=cv.getBoundingClientRect();cv.width=r2.width*d;cv.height=r2.height*d;cx=cv.getContext("2d");cx.scale(d,d);cx.lineWidth=5;cx.lineCap="round";cx.lineJoin="round";cx.strokeStyle=getComputedStyle(document.body).color})}}
+
+/* ===================== сессия ===================== */
+function go(list){const c=document.getElementById("mx");if(c)mixed=c.checked;L=mixed?sh(list):list.slice();i=0;sc=0;wr=[];fromRepeat=false;show()}
+function goRepeat(){if(!R.length)return;L=R.map(h=>allWords().find(w=>w.h===h)||{h,s:[],ru:"?"});i=0;sc=0;wr=[];fromRepeat=true;show()}
+function allWords(){let a=all0();return a}
+
 function show(){
- const w=L[i];tone=w.s.map(()=>null);done=false;self=false;
- $.innerHTML=`<div class="m"><span>${i+1} / ${L.length}</span><span>верно: ${sc}</span></div><div class="bar"><i style="width:${i/L.length*100}%"></i></div>
- <div class="q">${w.ru}</div><div class="m"><span>${w.pos||"выражение"}</span><span>слогов: ${w.s.length}</span></div>
- <input type="text" id="hz" class="hz" placeholder="Иероглиф — впиши здесь или нарисуй ниже" autocomplete="off">
- <canvas id="cv"></canvas><button class="b" onclick="clr()">Очистить рисунок</button>
- ${w.s.map((_,k)=>`<div class="sy"><input type="text" class="py" placeholder="пиньинь, слог ${k+1} (например, xi)" autocapitalize="off" autocorrect="off" spellcheck="false"><div class="tn">${[0,1,2,3,4].map(t=>`<button data-k="${k}" data-t="${t}">${t}</button>`).join("")}</div></div>`).join("")}
- <div id="fb"></div><button class="b p" id="ck" onclick="check()">Проверить</button>`;
- document.querySelectorAll(".tn button").forEach(b=>b.onclick=()=>{if(done)return;const k=+b.dataset.k;tone[k]=+b.dataset.t;document.querySelectorAll(`.tn button[data-k="${k}"]`).forEach(x=>x.classList.toggle("on",x===b))});
- initCv()}
-let cv,cx,dr=false;
-function initCv(){cv=document.getElementById("cv");const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;cx=cv.getContext("2d");cx.scale(d,d);cx.lineWidth=5;cx.lineCap="round";cx.lineJoin="round";cx.strokeStyle=getComputedStyle(document.body).color;
+ const w=L[i];done=false;self=null;
+ const hzH=HIDE.hz?"display:none":"";
+ const cvH=HIDE.cv?"display:none":"";
+ $.innerHTML=`<div class="m"><span>${i+1} / ${L.length}</span><span>верно: ${sc}</span></div>
+ <div class="bar"><i style="width:${i/L.length*100}%"></i></div>
+ <div class="q">${w.ru}</div>
+ <div class="m"><span>${w.pos||"выражение"}</span><span>слогов: ${w.s.length}</span></div>
+ <div id="hzWrap" style="${hzH}"><input type="text" id="inp" class="hz" placeholder="Иероглифы и/или пиньинь (ni3 hao3 / nǐ hǎo / 你好)" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+ <div id="cvWrap" style="${cvH}"><canvas id="cv" style="height:${ZOOM}px"></canvas><div class="tools"><button onclick="clr()">Очистить</button><button onclick="zoom(-70)">−</button><button onclick="zoom(70)">+</button></div></div>
+ <div id="fb"></div>
+ <div class="row" id="actions"></div>`;
+ paintActions();
+ initCv();
+}
+
+function paintActions(){
+ const a=document.getElementById("actions");
+ if(!a)return;
+ if(!done){
+   a.innerHTML=`<button class="b p" style="margin:0" onclick="check()">Проверить</button>`;
+ }else{
+   const w=L[i];
+   const inR=R.includes(w.h);
+   a.innerHTML=`<button class="b" style="margin:0" onclick="toRepeat()" ${inR?"disabled":""}>${inR?"Уже в повторялке":"Закинуть в повторялку"}</button>
+   <button class="b p" style="margin:0" onclick="nx()">${i+1<L.length?"Дальше":"Результат"}</button>`;
+ }
+}
+
+let cvReady=false;
+function initCv(){
+ cv=document.getElementById("cv");
+ if(!cv){cvReady=false;return}
+ cvReady=true;
+ const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;
+ cv.width=r.width*d;cv.height=r.height*d;
+ cx=cv.getContext("2d");cx.scale(d,d);cx.lineWidth=5;cx.lineCap="round";cx.lineJoin="round";cx.strokeStyle=getComputedStyle(document.body).color;
  const pt=e=>{const q=cv.getBoundingClientRect();return[e.clientX-q.left,e.clientY-q.top]};
  cv.onpointerdown=e=>{dr=true;cv.setPointerCapture(e.pointerId);const[x,y]=pt(e);cx.beginPath();cx.moveTo(x,y);cx.lineTo(x+.1,y+.1);cx.stroke()};
  cv.onpointermove=e=>{if(!dr)return;const[x,y]=pt(e);cx.lineTo(x,y);cx.stroke()};
- cv.onpointerup=cv.onpointercancel=()=>{dr=false}}
-function clr(){cx.clearRect(0,0,cv.width,cv.height)}
+ cv.onpointerup=cv.onpointercancel=()=>{dr=false}
+}
+function clr(){if(cx&&cv)cx.clearRect(0,0,cv.width,cv.height)}
+
+/* ===================== проверка ===================== */
 function check(){
- const w=L[i],ins=[...document.querySelectorAll(".py")];done=true;
- const typed=document.getElementById("hz").value.replace(/\s/g,"");
- hzOk=typed?typed===w.h:null;
- pyOk=w.s.every((s,k)=>{const m=ins[k].value.trim().toLowerCase().replace(/ü/g,"v").match(/^([a-z]+)([0-4])?$/);if(!m)return false;const t=tone[k]!==null?tone[k]:(m[2]!==undefined?+m[2]:null);return m[1]===s.slice(0,-1)&&t===+s.slice(-1)});
- ins.forEach(x=>x.disabled=true);document.getElementById("hz").disabled=true;
- const ans=w.s.map(mark).join(" ");
- document.getElementById("fb").innerHTML=`<div class="r ${pyOk?"ok":"no"}">Пиньинь и тоны: ${pyOk?"верно ✓":"есть ошибка ✗"}<br><b>${ans}</b> <small>(${w.s.join(" ")})</small></div>
- <div class="r ${hzOk===true?"ok":hzOk===false?"no":""}" ${hzOk===null?'style="border:1px solid var(--bd)"':""}>Иероглиф: <span class="big">${w.h}</span> ${hzOk===true?"✓":hzOk===false?"✗":""}
- ${hzOk===null?`<br><small>Сравни со своим рисунком.</small><button class="b" id="sf" onclick="tg()">Рисунок верный: нет</button>`:""}</div>`;
- const c=document.getElementById("ck");c.textContent=i+1<L.length?"Дальше":"Результат";c.onclick=nx}
-function tg(){self=!self;document.getElementById("sf").textContent="Рисунок верный: "+(self?"да":"нет")}
-function nx(){const ok=pyOk&&(hzOk===null?self:hzOk),w=L[i],q=P[w.h]||{s:0};q.s=ok?q.s+1:0;P[w.h]=q;sv();if(ok)sc++;else wr.push(L[i]);i++;i<L.length?show():end()}
+ const w=L[i];done=true;
+ const inp=document.getElementById("inp");
+ const raw=inp?inp.value:"";
+ const hzIn=hasHz(raw);
+ const pyIn=hasPy(raw);
+
+ /* иероглифы */
+ let hzOK=null;
+ if(hzIn){
+   hzOK=normHz(raw)===normHz(w.h);
+ }
+ /* пиньинь */
+ let pyOK=null,pyNoTone=false;
+ if(pyIn){
+   const target=norm(w.s.join(" "));
+   const got=norm(raw);
+   pyOK=(got===target);
+   if(!pyOK){
+     /* вариант без тонов */
+     const noT=s=>s.replace(/[0-9]/g,"");
+     if(noT(got)===noT(target)){pyOK=true;pyNoTone=true}
+   }
+ }
+ /* итог */
+ const drawn=cv&&cvReady&&!HIDE.cv;
+ let ok;
+ if(hzOK===null&&pyOK===null){
+   /* ничего не введено — полагаемся на рисунок */
+   ok=null;
+ }else{
+   ok=(hzOK!==false)&&(pyOK!==false);
+ }
+ self=null;
+
+ /* подсветка поля */
+ if(inp){
+   inp.classList.remove("ok","no");
+   if(ok===true)inp.classList.add("ok");
+   else if(ok===false)inp.classList.add("no");
+   inp.disabled=true;
+ }
+
+ /* блок результата */
+ let fb="";
+ if(hzOK!==null||pyOK!==null){
+   const hzRight=w.h, hzWrong=(hzOK===false);
+   const pyRight=w.s.map(mark).join(" "), pyWrong=(pyOK===false);
+   fb+=`<div class="res">
+     <div class="ansbox ${hzOK===true?"ok":hzOK===false?"no":""}">
+       <small>Иероглифы</small><br>
+       ${hzIn?`<span style="text-decoration:${hzOK===false?"line-through":"none"}">${normHz(raw)}</span>`:`<span class="tiny">—</span>`}
+       ${hzOK===false?`<span class="arrow">→</span><b>${hzRight}</b>`:""}
+       ${hzOK===true?" ✓":""}
+     </div>
+     <div class="ansbox ${pyOK===true?"ok":pyOK===false?"no":""}">
+       <small>Пиньинь</small><br>
+       ${pyIn?`<span style="text-decoration:${pyOK===false?"line-through":"none"}">${raw.trim()}</span>`:`<span class="tiny">—</span>`}
+       ${pyOK===false?`<span class="arrow">→</span><b>${pyRight}</b>`:""}
+       ${pyOK===true?(pyNoTone?" ✓ (тоны не проверены)":" ✓"):""}
+     </div>
+   </div>`;
+ }
+ if(ok===null&&drawn){
+   fb+=`<div class="r" style="border:1px solid var(--bd)">Ответ: <span class="big">${w.h}</span><br><b>${w.s.map(mark).join(" ")}</b>
+   <div class="row" style="margin-top:8px">
+     <button class="b" style="margin:0" onclick="selfAns(false)">Нет</button>
+     <button class="b p" style="margin:0" onclick="selfAns(true)">Верно</button>
+   </div></div>`;
+ }else if(ok===null&&!drawn){
+   fb+=`<div class="r no">Введите ответ или нарисуйте иероглиф.</div>`;
+ }
+ document.getElementById("fb").innerHTML=fb;
+ paintActions();
+}
+
+function selfAns(v){self=v;const w=L[i];const ok=(self===true);
+ /* записываем в прогресс сразу */
+ const q=P[w.h]||{s:0};q.s=ok?q.s+1:0;P[w.h]=q;
+ if(ok){sc++}else{wr.push(w)}
+ sv();
+ paintActions();
+ /* блокируем повторное нажатие */
+ document.querySelectorAll("#fb .row button").forEach(b=>b.disabled=true);
+}
+
+function toRepeat(){const w=L[i];if(!R.includes(w.h)){R.push(w.h);sv()}paintActions()}
+
+function nx(){
+ const w=L[i];
+ /* если ответ ещё не зафиксирован (нет ни ввода, ни selfAns) — считаем неверным? нет: требуем проверить */
+ if(!done){return}
+ /* если selfAns уже записал — не дублируем */
+ if(self===null){
+   let hzOK=null,pyOK=null;
+   const inp=document.getElementById("inp");
+   const raw=inp?inp.value:"";
+   if(hasHz(raw))hzOK=normHz(raw)===normHz(w.h);
+   if(hasPy(raw)){
+     const target=norm(w.s.join(" "));const got=norm(raw);
+     pyOK=(got===target);
+     if(!pyOK){const noT=s=>s.replace(/[0-9]/g,"");if(noT(got)===noT(target))pyOK=true}
+   }
+   const ok=(hzOK!==false)&&(pyOK!==false)&&(hzOK!==null||pyOK!==null);
+   const q=P[w.h]||{s:0};q.s=ok?q.s+1:0;P[w.h]=q;
+   if(ok){sc++}else{wr.push(w)}
+   sv();
+   /* повторялка: при верном ответе удаляем */
+   if(ok&&fromRepeat){R=R.filter(h=>h!==w.h);sv()}
+ }
+ i++;
+ i<L.length?show():end();
+}
+
 function end(){$.innerHTML=`<h1>Результат: ${sc} из ${L.length}</h1>${wr.length?`<p>Повтори эти слова:</p>`+wr.map(w=>`<div class="r no"><span class="big">${w.h}</span> ${w.s.map(mark).join(" ")}<br>${w.ru}</div>`).join("")+`<button class="b p" onclick="go(wr.slice())">Повторить ошибки</button>`:`<p>Без ошибок! 🎉</p>`}<button class="b" onclick="home()">В начало</button>`}
 
-/* ===== Тренажёр чисел ===== */
+/* ===================== тренажёр чисел ===================== */
 const CH=["零","一","二","三","四","五","六","七","八","九"];
 const PY={零:"ling2",一:"yi1",二:"er4",两:"liang3",三:"san1",四:"si4",五:"wu3",六:"liu4",七:"qi1",八:"ba1",九:"jiu3",十:"shi2",百:"bai3",千:"qian1"};
 const U1=["","один","два","три","четыре","пять","шесть","семь","восемь","девять"];
@@ -801,13 +1005,16 @@ function nCheck(){
  const vs=zhVariants(nN);let ok=false,note="";
  if(ND=="cz"){ok=raw.replace(/[\s,.]/g,"")===String(nN)}
  else if(/[\u4e00-\u9fff]/.test(raw)){const t=raw.replace(/\s/g,"");ok=vs.some(x=>x.join("")===t)}
- else{let s=raw.toLowerCase().replace(/[\s'’\-]/g,"").replace(/ü/g,"v");
-  s=s.replace(/([a-z]+)([0-5])/g,(m,b,t)=>mark(b+(t==5?0:t)));
-  ok=vs.some(x=>x.map(c=>mark(PY[c])).join("")===s);
-  if(!ok&&/^[a-z]+$/.test(s)&&vs.some(x=>x.map(c=>PY[c].slice(0,-1)).join("")===s)){ok=true;note="тоны не проверены"}}
+ else{
+   const got=norm(raw);
+   ok=vs.some(x=>norm(x.map(c=>PY[c]).join(" "))===got);
+   if(!ok){const noT=s=>s.replace(/[0-9]/g,"");if(vs.some(x=>noT(norm(x.map(c=>PY[c]).join(" ")))===noT(got))){ok=true;note="тоны не проверены"}}
+ }
  nTot++;if(ok)nOk++;nDone=true;a.disabled=true;
+ a.classList.remove("ok","no");a.classList.add(ok?"ok":"no");
  const v=vs[0],alt=vs.length>1?`<br><small>Допустимо также: ${vs.slice(1).map(x=>x.join("")).join(" / ")}</small>`:"";
  document.getElementById("nfb").innerHTML=`<div class="r ${ok?"ok":"no"}">${ok?"Верно ✓":"Неверно ✗"}${note?" <small>("+note+")</small>":""}<br><b>${nN}</b> — ${ruWords(nN)}<br><span class="big">${v.join("")}</span><br>${v.map(c=>mark(PY[c])).join(" ")}${alt}</div>`;
  const b=document.getElementById("nb");b.textContent="Дальше";b.onclick=nNew}
+
 home();
 </script></body></html>
