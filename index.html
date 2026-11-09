@@ -41,6 +41,9 @@ small{color:var(--mu)}
 .tools{display:flex;gap:6px;margin:6px 0}
 .tools button{flex:1;padding:8px 0;border:1px solid var(--bd);border-radius:10px;background:var(--card)}
 .tiny{font-size:13px;color:var(--mu)}
+.selbox{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;margin:8px 0}
+.selbox label{margin:2px 0;display:flex;align-items:center;gap:6px;color:var(--tx)}
+.selbox .sec{grid-column:1/-1;color:var(--mu);font-size:13px;margin-top:6px}
 </style></head><body><div id="app"></div>
 <script>
 /* ===================== утилиты ===================== */
@@ -69,13 +72,14 @@ const $=document.getElementById("app");
 const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 
 /* ===================== хранилище ===================== */
-let P={},X=[],R=[],HIDE={},ZOOM=170;
+let P={},X=[],R=[],HIDE={},ZOOM=170,SEL=new Set();
 try{
   P=JSON.parse(localStorage.getItem("hz1")||"{}");
   X=JSON.parse(localStorage.getItem("hz1x")||"[]");
   R=JSON.parse(localStorage.getItem("hz1r")||"[]");
   HIDE=JSON.parse(localStorage.getItem("hz1hide")||"{}");
   ZOOM=+localStorage.getItem("hz1zoom")||170;
+  SEL=new Set(JSON.parse(localStorage.getItem("hz1sel")||"[]"));
 }catch(e){}
 const sv=()=>{try{
   localStorage.setItem("hz1",JSON.stringify(P));
@@ -83,6 +87,7 @@ const sv=()=>{try{
   localStorage.setItem("hz1r",JSON.stringify(R));
   localStorage.setItem("hz1hide",JSON.stringify(HIDE));
   localStorage.setItem("hz1zoom",String(ZOOM));
+  localStorage.setItem("hz1sel",JSON.stringify([...SEL]));
 }catch(e){}};
 
 const mk=t=>t.split("\n").filter(Boolean).map(l=>{const p=l.split("|");return{h:p[0],s:p[1].split(" "),ru:p[2],pos:p[3],l:+p[4]||0}});
@@ -761,12 +766,20 @@ function lw(n){
   if(n==20)return LW[20].concat(X20);
   return LW[n]||[];
 }
+/* только базовые (для карточки урока) */
+function lwBase(n){return LW[n]||[]}
+/* только доп. слова урока */
+function lwExtra(n){if(n==18)return X18;if(n==19)return X19a.concat(X19b);if(n==20)return X20;return []}
 const lr=w=>(P[w.h]&&P[w.h].s>=2);
 const LV=[150,300,600,1200];
 
 /* ===================== состояние сессии ===================== */
 let L=[],i=0,sc=0,wr=[],done=false,self=null,mixed=true,fromRepeat=false;
 let cv,cx,dr=false,cvReady=false;
+
+/* ключи выбора: "b1".."b20" — базовые уроки, "e18","e19","e20" — доп. слова */
+function selKeyBase(n){return "b"+n}
+function selKeyExtra(n){return "e"+n}
 
 /* ===================== главный экран ===================== */
 function home(){
@@ -775,12 +788,25 @@ function home(){
  const ls=T.slice(0,20).map((t,j)=>{const n=j+1,w=lw(n),d=w.filter(lr).length;
    return w.length?`<button class="b ls" onclick="go(lw(${n}))"><span><b>${n}.</b> ${t}</span><small>${d}/${w.length}</small></button>`:`<div class="b ls dis"><span><b>${n}.</b> ${t}</span><small>слов пока нет</small></div>`}).join("");
  const rep=R.length?`<button class="b ls" style="border-color:var(--ac)" onclick="goRepeat()"><span>🔁 Повторялка</span><small>${R.length}</small></button>`:"";
+ /* чекбоксы выбора */
+ const baseChecks=Array.from({length:20},(_,j)=>{const n=j+1;return `<label><input type="checkbox" data-sel="b${n}" ${SEL.has(selKeyBase(n))?"checked":""} onchange="toggleSel('b${n}',this.checked)"> ${n}. ${T[j]||""}</label>`}).join("");
+ const extraChecks=[18,19,20].map(n=>`<label><input type="checkbox" data-sel="e${n}" ${SEL.has(selKeyExtra(n))?"checked":""} onchange="toggleSel('e${n}',this.checked)"> доп. слова к ${n}</label>`).join("");
  $.innerHTML=`<h1>Тренажёр иероглифов 汉字</h1>
  <div class="hs"><b>Выучено слов: ${k} из ${all.length}</b><div class="pb"><i style="width:${all.length?Math.round(k/all.length*100):0}%"></i></div><small>Слово считается выученным после двух верных ответов подряд.</small></div>
  <button class="b p" onclick="numHome()">🔢 Тренажёр чисел</button>
  <label><input type="checkbox" id="mx" ${mixed?"checked":""}> Перемешать слова</label>
  <button class="b p" onclick="go(all0())">Все слова</button><button class="b" onclick="go(all0().filter(w=>!lr(w)))">Только невыученные</button>
  ${rep}
+ <div class="hs"><b>Выбрать уроки для тренировки</b>
+   <div class="tiny" style="margin-bottom:4px">Отметьте нужные уроки и/или доп. слова, затем нажмите «Тренировать выбранное».</div>
+   <div class="selbox">${baseChecks}<div class="sec">Доп. слова к урокам:</div>${extraChecks}</div>
+   <div class="row" style="margin-top:6px">
+     <button class="b" style="margin:0" onclick="selAll(true)">Выбрать все</button>
+     <button class="b" style="margin:0" onclick="selAll(false)">Снять все</button>
+   </div>
+   <button class="b p" onclick="goSelected()">Тренировать выбранное</button>
+   <div id="selInfo" class="tiny"></div>
+ </div>
  ${ls}
  <div class="hs"><b>Доп. слова${X.length?" ("+X.length+")":""}</b>${X.length?`<button class="b ls" onclick="go(X)"><span>Тренировать</span><small>${X.filter(lr).length}/${X.length}</small></button>`:""}
  <input type="text" id="xh" placeholder="Иероглифы"><input type="text" id="xp" placeholder="Пиньинь с цифрами: xi2 guan4" autocapitalize="off"><input type="text" id="xr" placeholder="Перевод"><button class="b" onclick="addX()">Добавить</button><small id="xm"></small></div>
@@ -789,7 +815,9 @@ function home(){
  <label><input type="checkbox" id="hC" ${HIDE.cv?"checked":""} onchange="toggleHide('cv',this.checked)"> Скрывать окно для рисования</label>
  <div class="tiny">Масштаб окна рисования: <b id="zv">${ZOOM}px</b> <button class="b" style="display:inline-block;width:auto;padding:4px 10px;margin:0 4px" onclick="zoom(-70)">−</button><button class="b" style="display:inline-block;width:auto;padding:4px 10px;margin:0 4px" onclick="zoom(70)">+</button><button class="b" style="display:inline-block;width:auto;padding:4px 10px;margin:0 4px" onclick="zoom(0)">сброс</button></div>
  </div>
- <button class="b" id="rs" onclick="rst()">Сбросить прогресс</button>`}
+ <button class="b" id="rs" onclick="rst()">Сбросить прогресс</button>`;
+ updateSelInfo();
+}
 function all0(){let a=[];for(let n=1;n<=20;n++)a=a.concat(lw(n));return a.concat(X)}
 function addX(){const h=document.getElementById("xh").value.trim(),p=document.getElementById("xp").value.trim().toLowerCase().split(/\s+/),r=document.getElementById("xr").value.trim(),m=document.getElementById("xm");
  if(!h||!r||p.length!=[...h].length||!p.every(x=>/^[a-z]+[0-4]$/.test(x))){m.textContent="Проверь: слогов должно быть столько же, сколько иероглифов, у каждого цифра тона 0–4.";return}
@@ -798,6 +826,39 @@ function rst(){const b=document.getElementById("rs");if(b.dataset.a){P={};R=[];s
 function toggleHide(k,v){HIDE[k]=v;sv()}
 function zoom(d){ZOOM=d?Math.max(100,Math.min(700,ZOOM+d)):170;sv();const z=document.getElementById("zv");if(z)z.textContent=ZOOM+"px";applyZoom()}
 function applyZoom(){if(cv){const r=cv.getBoundingClientRect();const d=devicePixelRatio||1;cv.style.height=ZOOM+"px";requestAnimationFrame(()=>{const r2=cv.getBoundingClientRect();cv.width=r2.width*d;cv.height=r2.height*d;cx=cv.getContext("2d");cx.scale(d,d);cx.lineWidth=5;cx.lineCap="round";cx.lineJoin="round";cx.strokeStyle=getComputedStyle(document.body).color})}}
+
+/* ===================== выбор уроков ===================== */
+function toggleSel(key,on){if(on)SEL.add(key);else SEL.delete(key);sv();updateSelInfo()}
+function selAll(on){
+ for(let n=1;n<=20;n++){const k=selKeyBase(n);if(on)SEL.add(k);else SEL.delete(k)}
+ for(const n of [18,19,20]){const k=selKeyExtra(n);if(on)SEL.add(k);else SEL.delete(k)}
+ sv();
+ document.querySelectorAll("input[data-sel]").forEach(c=>{c.checked=SEL.has(c.dataset.sel)});
+ updateSelInfo();
+}
+function selectedWords(){
+ let list=[];
+ for(let n=1;n<=20;n++){
+   if(SEL.has(selKeyBase(n)))list=list.concat(lwBase(n));
+   if([18,19,20].includes(n)&&SEL.has(selKeyExtra(n)))list=list.concat(lwExtra(n));
+ }
+ /* убрать возможные дубли по иероглифу */
+ const seen=new Set();const out=[];
+ for(const w of list){if(!seen.has(w.h)){seen.add(w.h);out.push(w)}}
+ return out;
+}
+function updateSelInfo(){
+ const el=document.getElementById("selInfo");
+ if(!el)return;
+ const w=selectedWords();
+ if(!w.length){el.textContent="Ничего не выбрано.";return}
+ el.textContent=`Выбрано слов: ${w.length} (из них выучено: ${w.filter(lr).length})`;
+}
+function goSelected(){
+ const w=selectedWords();
+ if(!w.length){alert("Выберите хотя бы один урок или блок доп. слов.");return}
+ go(w);
+}
 
 /* ===================== сессия ===================== */
 function go(list){const c=document.getElementById("mx");if(c)mixed=c.checked;L=mixed?sh(list):list.slice();i=0;sc=0;wr=[];fromRepeat=false;show()}
@@ -974,7 +1035,7 @@ function nShow(){
  const q=cz?`<div class="big" style="margin:14px 0 6px">${v.join("")}</div><button class="b" onclick="nHint()">Показать пиньинь</button><div id="nhint"></div>`
   :NS=="d"?`<div class="big" style="margin:14px 0">${nN}</div>`:`<div class="q" style="margin:14px 0">${ruWords(nN)}</div>`;
  $.innerHTML=`<div class="m"><span><b>Тренажёр чисел</b></span><span>верно: ${nOk} из ${nTot}</span></div>
- <div class="tn" style="margin:10px 0"><button class="${cz?"on":""}" onclick="nSet('cz')">Кит → рус</button><button class="${cz?"":"on"}" onclick="nSet('zc')">Рус → кит</button></div>
+ <div class="tn" style="margin:10px 0"><button class="${cz?"on":""}" onclick="nSet('cz')">Кит → рус</button><button class="${cz?"":"on"}" onclick="nSet('rz')">Рус → кит</button></div>
  ${cz?"":`<div class="tn" style="margin-bottom:6px"><button class="${NS=="d"?"on":""}" onclick="nStyle('d')">Цифрами</button><button class="${NS=="w"?"on":""}" onclick="nStyle('w')">Словами</button></div>`}
  ${q}
  <input type="text" id="na" placeholder="${cz?"Число цифрами":"Иероглифы или пиньинь (yi1 qian1 …)"}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
