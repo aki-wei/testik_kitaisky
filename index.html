@@ -56,11 +56,14 @@ function norm(s){
   for(const ch of s){
     if(RV[ch]){out+=RV[ch]}
     else if(/[a-z0-9]/.test(ch)){out+=ch}
-    /* всё остальное (пробелы, дефисы, апострофы, иероглифы и пр.) пропускаем */
   }
   out=out.replace(/5/g,"0");
   return out;
 }
+/* убираем нулевой тон (0) — его можно не писать: xi == xi0 */
+function stripZero(s){return s.replace(/0/g,"")}
+/* убираем все цифры тонов — для проверки «без тонов» */
+function noTone(s){return s.replace(/[0-9]/g,"")}
 /* иероглифы без пробелов */
 function normHz(s){return String(s).replace(/\s+/g,"")}
 /* содержит ли строка иероглифы */
@@ -764,7 +767,7 @@ const LV=[150,300,600,1200];
 
 /* ===================== состояние сессии ===================== */
 let L=[],i=0,sc=0,wr=[],done=false,self=null,mixed=true,fromRepeat=false;
-let cv,cx,dr=false;
+let cv,cx,dr=false,cvReady=false;
 
 /* ===================== главный экран ===================== */
 function home(){
@@ -834,7 +837,6 @@ function paintActions(){
  }
 }
 
-let cvReady=false;
 function initCv(){
  cv=document.getElementById("cv");
  if(!cv){cvReady=false;return}
@@ -867,18 +869,15 @@ function check(){
  if(pyIn){
    const target=norm(w.s.join(" "));
    const got=norm(raw);
-   pyOK=(got===target);
-   if(!pyOK){
-     /* вариант без тонов */
-     const noT=s=>s.replace(/[0-9]/g,"");
-     if(noT(got)===noT(target)){pyOK=true;pyNoTone=true}
-   }
+   if(got===target){pyOK=true}
+   else if(stripZero(got)===stripZero(target)){pyOK=true}
+   else if(noTone(got)===noTone(target)){pyOK=true;pyNoTone=true}
+   else pyOK=false;
  }
  /* итог */
  const drawn=cv&&cvReady&&!HIDE.cv;
  let ok;
  if(hzOK===null&&pyOK===null){
-   /* ничего не введено — полагаемся на рисунок */
    ok=null;
  }else{
    ok=(hzOK!==false)&&(pyOK!==false);
@@ -896,8 +895,7 @@ function check(){
  /* блок результата */
  let fb="";
  if(hzOK!==null||pyOK!==null){
-   const hzRight=w.h, hzWrong=(hzOK===false);
-   const pyRight=w.s.map(mark).join(" "), pyWrong=(pyOK===false);
+   const hzRight=w.h, pyRight=w.s.map(mark).join(" ");
    fb+=`<div class="res">
      <div class="ansbox ${hzOK===true?"ok":hzOK===false?"no":""}">
        <small>Иероглифы</small><br>
@@ -927,12 +925,10 @@ function check(){
 }
 
 function selfAns(v){self=v;const w=L[i];const ok=(self===true);
- /* записываем в прогресс сразу */
  const q=P[w.h]||{s:0};q.s=ok?q.s+1:0;P[w.h]=q;
  if(ok){sc++}else{wr.push(w)}
  sv();
  paintActions();
- /* блокируем повторное нажатие */
  document.querySelectorAll("#fb .row button").forEach(b=>b.disabled=true);
 }
 
@@ -940,9 +936,7 @@ function toRepeat(){const w=L[i];if(!R.includes(w.h)){R.push(w.h);sv()}paintActi
 
 function nx(){
  const w=L[i];
- /* если ответ ещё не зафиксирован (нет ни ввода, ни selfAns) — считаем неверным? нет: требуем проверить */
  if(!done){return}
- /* если selfAns уже записал — не дублируем */
  if(self===null){
    let hzOK=null,pyOK=null;
    const inp=document.getElementById("inp");
@@ -950,14 +944,15 @@ function nx(){
    if(hasHz(raw))hzOK=normHz(raw)===normHz(w.h);
    if(hasPy(raw)){
      const target=norm(w.s.join(" "));const got=norm(raw);
-     pyOK=(got===target);
-     if(!pyOK){const noT=s=>s.replace(/[0-9]/g,"");if(noT(got)===noT(target))pyOK=true}
+     if(got===target)pyOK=true;
+     else if(stripZero(got)===stripZero(target))pyOK=true;
+     else if(noTone(got)===noTone(target))pyOK=true;
+     else pyOK=false;
    }
    const ok=(hzOK!==false)&&(pyOK!==false)&&(hzOK!==null||pyOK!==null);
    const q=P[w.h]||{s:0};q.s=ok?q.s+1:0;P[w.h]=q;
    if(ok){sc++}else{wr.push(w)}
    sv();
-   /* повторялка: при верном ответе удаляем */
    if(ok&&fromRepeat){R=R.filter(h=>h!==w.h);sv()}
  }
  i++;
@@ -1007,8 +1002,11 @@ function nCheck(){
  else if(/[\u4e00-\u9fff]/.test(raw)){const t=raw.replace(/\s/g,"");ok=vs.some(x=>x.join("")===t)}
  else{
    const got=norm(raw);
-   ok=vs.some(x=>norm(x.map(c=>PY[c]).join(" "))===got);
-   if(!ok){const noT=s=>s.replace(/[0-9]/g,"");if(vs.some(x=>noT(norm(x.map(c=>PY[c]).join(" ")))===noT(got))){ok=true;note="тоны не проверены"}}
+   const targets=vs.map(x=>norm(x.map(c=>PY[c]).join(" ")));
+   if(targets.some(t=>t===got)){ok=true}
+   else if(targets.some(t=>stripZero(t)===stripZero(got))){ok=true}
+   else if(targets.some(t=>noTone(t)===noTone(got))){ok=true;note="тоны не проверены"}
+   else ok=false;
  }
  nTot++;if(ok)nOk++;nDone=true;a.disabled=true;
  a.classList.remove("ok","no");a.classList.add(ok?"ok":"no");
