@@ -80,7 +80,6 @@ canvas{width:100%;height:170px;min-height:80px;background:var(--card);border:1px
 .tn .on{background:var(--ac)!important;color:#fff!important;border-color:var(--ac)!important}
 </style></head><body><div id="app"></div>
 <script type="module">
-/* ==================== FIREBASE ==================== */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -98,11 +97,9 @@ const firebaseConfig = {
   appId: "1:465003122218:web:2c14141777e66079cfbd53",
   measurementId: "G-V7RFFRNRC5"
 };
-
 const fbApp = initializeApp(firebaseConfig);
 const fbAuth = getAuth(fbApp);
 const fbDb = getFirestore(fbApp);
-
 window.FB = {
   auth: fbAuth, db: fbDb,
   doc, getDoc, setDoc, deleteDoc,
@@ -149,18 +146,11 @@ window.__startApp = function(){
         await window.FB.setDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid),{
           avatar: CURRENT_AVATAR,
           nick: CURRENT_NICK,
-          data: {
-            P, X, R, HIDE, ZOOM,
-            SEL:[...SEL],
-            CUSTOM,
-            autosort: !!window.__autosort,
-            updatedAt: Date.now()
-          }
+          data: { P, X, R, HIDE, ZOOM, SEL:[...SEL], CUSTOM, autosort: !!window.__autosort, updatedAt: Date.now() }
         }, {merge:true});
       }catch(e){console.warn("save error",e)}
     },500);
   }
-
   async function loadProgress(uid){
     try{
       const snap=await window.FB.getDoc(window.FB.doc(window.FB.db,"users",uid));
@@ -851,15 +841,12 @@ window.__startApp = function(){
     if(window.__autosort)return;
     XB.forEach(w=>{if(!X.some(x=>x.h===w.h))X.push({...w,blk:""})});
     X.forEach(w=>{if(w.blk==null)w.blk=""});
-
     const ensure=(name)=>{let b=CUSTOM.find(b=>b.name===name);if(!b){b={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),name};CUSTOM.push(b)}return "c:"+b.id};
     const bC=ensure("Страны"),bCol=ensure("Цвета"),bFood=ensure("Еда и напитки"),bNum=ensure("Числа");
-
     const COUNTRIES=new Set(["日本","中国","法国","西班牙","巴西","俄罗斯","英国","德国","意大利","白俄罗斯","土耳其","美国","韩国","朝鲜","加拿大","澳大利亚","印度","泰国","越南","蒙古","哈萨克斯坦","乌克兰","比利时"]);
     const COLORS=new Set(["红","紫","棕","橙","粉红","金色","银色","白","黑","灰","蓝","绿","黄","色"]);
     const FOOD=new Set(["苹果","香蕉","葡萄","西瓜","可可","可乐","百事可乐","肉","牛肉","羊肉","马肉","猪肉","鸡肉","米饭","面条儿","饺子","巧克力","蛋糕","甜","汤","茶","果汁","咖啡","啤酒","水","汽水","雪碧","七喜","芬达","美年达","汉堡","汉堡王","肯德基","芝士","芝士汉堡","薯条","快餐","炒","烤","炸","菜","面食","食品","馅儿"]);
     const NUMS=new Set(["零","一","二","两","三","四","五","六","七","八","九","十","百","千"]);
-
     for(const w of X){
       if((w.blk||"")!=="")continue;
       if(COUNTRIES.has(w.h)){w.blk=bC;continue}
@@ -902,18 +889,12 @@ window.__startApp = function(){
     const key=isExtra?("X:"+n):("L:"+n);
     return X.filter(w=>(w.blk||"")===key).slice().reverse();
   }
-  function lw(n){
-    let base=lwBase(n).slice();
-    let extra=lwExtra(n).slice();
-    return base.concat(extra);
-  }
+  function lw(n){return lwBase(n).slice().concat(lwExtra(n).slice())}
 
   const lr=w=>(P[w.h]&&P[w.h].s>=2);
   const LV=[150,300,600,1200];
-
   let L=[],i=0,sc=0,wr=[],done=false,self=null,fromRepeat=false;
   let cv,cx,dr=false,cvReady=false;
-
   function selKeyBase(n){return "b"+n}
   function selKeyExtra(n){return "e"+n}
   function selKeyMy(blk){return "m:"+blk}
@@ -945,7 +926,6 @@ window.__startApp = function(){
     </div>`;
     renderAvaP();
   }
-
   function renderAvaP(){
     const el=document.getElementById("avaP");
     if(!el)return;
@@ -961,11 +941,8 @@ window.__startApp = function(){
     const err=document.getElementById("err");
     err.textContent="";
     if(!email||!pass){err.textContent="Введите email и пароль";return}
-    try{
-      await window.FB.signInWithEmailAndPassword(window.FB.auth,email,pass);
-    }catch(e){
-      err.textContent=ruErr(e.code||e.message);
-    }
+    try{await window.FB.signInWithEmailAndPassword(window.FB.auth,email,pass);}
+    catch(e){err.textContent=ruErr(e.code||e.message);}
   };
   window.__doRegister=async function(){
     const email=document.getElementById("email").value.trim();
@@ -979,16 +956,10 @@ window.__startApp = function(){
       CURRENT_AVATAR=pickedAva;
       CURRENT_NICK="";
       await window.FB.setDoc(window.FB.doc(window.FB.db,"users",cred.user.uid),{
-        avatar: CURRENT_AVATAR,
-        nick: CURRENT_NICK,
-        data: {
-          P:{},X:[],R:[],HIDE:{hz:false,cv:false},ZOOM:170,
-          SEL:[],CUSTOM:[],autosort:false,updatedAt:Date.now()
-        }
+        avatar: CURRENT_AVATAR, nick: CURRENT_NICK,
+        data: {P:{},X:[],R:[],HIDE:{hz:false,cv:false},ZOOM:170,SEL:[],CUSTOM:[],autosort:false,updatedAt:Date.now()}
       });
-    }catch(e){
-      err.textContent=ruErr(e.code||e.message);
-    }
+    }catch(e){err.textContent=ruErr(e.code||e.message);}
   };
   function ruErr(code){
     if(code.includes("email-already-in-use"))return "Этот email уже зарегистрирован. Нажмите «Войти».";
@@ -1000,27 +971,19 @@ window.__startApp = function(){
     return "Ошибка: "+code;
   }
 
-  function openAvatarPicker(){SHOW_AVA=true;home()}
   function renderAvaP2(){
     const el=document.getElementById("avaP2");
     if(!el)return;
     el.innerHTML=AVAS.map(a=>`<button class="${a===CURRENT_AVATAR?"on":""}" onclick="__setAvatarEmoji('${a}')">${a}</button>`).join("");
   }
-  window.__closeAva=()=>{SHOW_AVA=false;home()};
-  window.__setAvatarEmoji=async a=>{
-    CURRENT_AVATAR=a;
-    await sv();
-    home();
-  };
+  window.__openAvatarPicker=()=>{SHOW_AVA=true;window.__home()};
+  window.__closeAva=()=>{SHOW_AVA=false;window.__home()};
+  window.__setAvatarEmoji=async a=>{CURRENT_AVATAR=a;await sv();window.__home()};
   window.__onAvaFile=async ev=>{
     const file=ev.target.files&&ev.target.files[0];
     if(!file)return;
-    try{
-      const dataUrl=await shrinkImage(file,128,0.85);
-      CURRENT_AVATAR=dataUrl;
-      await sv();
-      home();
-    }catch(e){alert("Не удалось загрузить изображение: "+e.message)}
+    try{const dataUrl=await shrinkImage(file,128,0.85);CURRENT_AVATAR=dataUrl;await sv();window.__home();}
+    catch(e){alert("Не удалось загрузить изображение: "+e.message)}
   };
   function shrinkImage(file,size,quality){
     return new Promise((resolve,reject)=>{
@@ -1029,8 +992,7 @@ window.__startApp = function(){
         const img=new Image();
         img.onload=()=>{
           try{
-            const c=document.createElement("canvas");
-            c.width=size;c.height=size;
+            const c=document.createElement("canvas");c.width=size;c.height=size;
             const ctx=c.getContext("2d");
             const s=Math.min(img.width,img.height);
             const sx=(img.width-s)/2, sy=(img.height-s)/2;
@@ -1051,9 +1013,7 @@ window.__startApp = function(){
     if(v==null)return;
     const t=v.trim();
     if(t.length<2||t.length>24){alert("Ник должен быть от 2 до 24 символов");return}
-    CURRENT_NICK=t;
-    await sv();
-    home();
+    CURRENT_NICK=t;await sv();window.__home();
   };
 
   window.__deleteAccount=async ()=>{
@@ -1066,19 +1026,15 @@ window.__startApp = function(){
     try{
       const cred = window.FB.EmailAuthProvider.credential(CURRENT_USER.email, pass);
       await window.FB.reauthenticateWithCredential(CURRENT_USER, cred);
-      try{await window.FB.deleteDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid));}catch(e){console.warn("firestore delete",e);}
+      try{await window.FB.deleteDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid));}catch(e){console.warn("fs del",e);}
       await window.FB.deleteUser(CURRENT_USER);
       try{await window.FB.signOut(window.FB.auth);}catch(e){}
       alert("Аккаунт удалён.");
     }catch(e){
-      const code = e.code || "";
-      if(code.includes("wrong-password") || code.includes("invalid-credential")){
-        alert("Неверный пароль. Удаление отменено.");
-      }else if(code.includes("requires-recent-login")){
-        alert("Не удалось подтвердить вход. Попробуйте выйти и войти заново, затем удалить аккаунт.");
-      }else{
-        alert("Не удалось удалить аккаунт: " + (e.message || e));
-      }
+      const code=e.code||"";
+      if(code.includes("wrong-password")||code.includes("invalid-credential"))alert("Неверный пароль. Удаление отменено.");
+      else if(code.includes("requires-recent-login"))alert("Не удалось подтвердить вход. Выйдите и войдите заново.");
+      else alert("Не удалось удалить аккаунт: "+(e.message||e));
     }
   };
 
@@ -1087,7 +1043,6 @@ window.__startApp = function(){
     for(let n=1;n<=20;n++)all=all.concat(lw(n));
     all=all.concat(X);
     const k=all.filter(lr).length;
-
     const rows=[];
     for(let n=1;n<=20;n++){
       const w=lwBase(n),d=w.filter(lr).length,t=T[n-1]||"";
@@ -1098,8 +1053,7 @@ window.__startApp = function(){
             <span class="ttl"><b>${n}.</b> ${t}</span>
           </label>
           <button style="flex:none;border:none;background:transparent;color:var(--ac);font-weight:600;padding:4px 8px" onclick="__go(lwBase(${n}))">▶</button>
-          <small>${d}/${w.length}</small>
-        </div>`);
+          <small>${d}/${w.length}</small></div>`);
       }else{
         rows.push(`<div class="b ls dis"><span class="ttl"><b>${n}.</b> ${t}</span><small>слов пока нет</small></div>`);
       }
@@ -1112,11 +1066,9 @@ window.__startApp = function(){
             <span class="ttl"><i>Доп. слова к уроку ${n}</i></span>
           </label>
           <button style="flex:none;border:none;background:transparent;color:var(--ac);font-weight:600;padding:4px 8px" onclick="__go(lwExtra(${n}))">▶</button>
-          <small>${d2}/${g.length}</small>
-        </div>`);
+          <small>${d2}/${g.length}</small></div>`);
       }
     }
-
     const blkRows=blocks().map((b,idx)=>{
       const g=wordsInBlock("c:"+b.id);
       const d=g.filter(lr).length;
@@ -1131,10 +1083,8 @@ window.__startApp = function(){
         </label>
         ${up}${dn}
         <button onclick="__goBlock('c:${b.id}')" title="Тренировать">▶</button>
-        <button onclick="__delBlock('${b.id}')" title="Удалить блок">✕</button>
-      </div>`;
+        <button onclick="__delBlock('${b.id}')" title="Удалить блок">✕</button></div>`;
     }).join("");
-
     const ls=rows.join("");
     const rep=R.length?`<button class="b ls" style="border-color:var(--ac)" onclick="__goRepeat()"><span>🔁 Повторялка</span><small>${R.length}</small></button>`:"";
     const unsorted=myUnsorted();
@@ -1144,23 +1094,17 @@ window.__startApp = function(){
         <span class="ttl">Дополнительные слова (не сортировано)</span>
       </label>
       <button style="flex:none;border:none;background:transparent;color:var(--ac);font-weight:600;padding:4px 8px" onclick="__goBlock('')">▶</button>
-      <small>${unsorted.filter(lr).length}/${unsorted.length}</small>
-    </div>`;
-
-    const avaHtml = CURRENT_AVATAR.startsWith("data:") ?
-      `<img src="${CURRENT_AVATAR}" alt="">` : (CURRENT_AVATAR||"👤");
+      <small>${unsorted.filter(lr).length}/${unsorted.length}</small></div>`;
+    const avaHtml = CURRENT_AVATAR.startsWith("data:")?`<img src="${CURRENT_AVATAR}" alt="">`:(CURRENT_AVATAR||"👤");
     const displayName = CURRENT_NICK || (CURRENT_USER?CURRENT_USER.email:"");
     const emailLine = CURRENT_NICK ? (CURRENT_USER?CURRENT_USER.email:"") : "";
-
     $.innerHTML=`<div class="topbar">
-        <div class="ava" onclick="__openAvatarPicker()" title="Нажмите, чтобы сменить аватар">${avaHtml}</div>
+        <div class="ava" onclick="__openAvatarPicker()" title="Сменить аватар">${avaHtml}</div>
         <div class="info">
           <div class="nm"><b>${escapeHtml(displayName)}</b>
-            <button class="iconbtn" onclick="__changeNick()" title="Сменить ник">✎</button>
-          </div>
+            <button class="iconbtn" onclick="__changeNick()" title="Сменить ник">✎</button></div>
           ${emailLine?`<small>${escapeHtml(emailLine)}</small>`:""}
-          <small>${k} из ${all.length} слов выучено</small>
-        </div>
+          <small>${k} из ${all.length} слов выучено</small></div>
         <button class="b" style="width:auto;margin:0;padding:8px 12px" onclick="__logout()">Выйти</button>
         <button class="delbtn" onclick="__deleteAccount()" title="Удалить аккаунт">✕</button>
       </div>
@@ -1168,41 +1112,32 @@ window.__startApp = function(){
         <b>Сменить аватар</b>
         <div class="avaP" id="avaP2"></div>
         <div class="row" style="margin-top:6px">
-          <label class="uploadLbl" style="flex:1">
-            Загрузить фото
-            <input type="file" id="avaFile" accept="image/*" style="display:none" onchange="__onAvaFile(event)">
-          </label>
+          <label class="uploadLbl" style="flex:1">Загрузить фото
+            <input type="file" id="avaFile" accept="image/*" style="display:none" onchange="__onAvaFile(event)"></label>
           <button class="b" style="margin:0;flex:1" onclick="__closeAva()">Закрыть</button>
-        </div>
-      </div>`:""}
+        </div></div>`:""}
       <h1>Тренажёр иероглифов 汉字</h1>
       <button class="b p" onclick="__numHome()">🔢 Тренажёр чисел</button>
       <label><input type="checkbox" id="mx" ${mixed?"checked":""} onchange="__setMixed(this.checked)"> Перемешать слова</label>
       <div class="row" style="margin:6px 0">
         <button class="b p" style="margin:0" onclick="__goSelected()">Выбранные слова</button>
-        <button class="b" style="margin:0" onclick="__markAll()">Отметить все</button>
-      </div>
+        <button class="b" style="margin:0" onclick="__markAll()">Отметить все</button></div>
       <div class="tiny" id="selInfo"></div>
       ${rep}
       ${ls}
       <div class="hs"><b>Мои блоки</b>${blkRows||`<div class="tiny">Блоков пока нет.</div>`}
         <input type="text" id="bn" placeholder="Название нового блока">
-        <button class="b" onclick="__addBlock()">Создать блок</button>
-      </div>
+        <button class="b" onclick="__addBlock()">Создать блок</button></div>
       ${unsortedBlock}
-
       <div class="hs"><b>Мои слова</b>
         <div class="tiny" style="margin-bottom:6px">Сначала нерассортированные, потом сортированные (по возрастанию).</div>
         <input type="text" id="xh" placeholder="Иероглифы"><input type="text" id="xp" placeholder="Пиньинь с цифрами: xi2 guan4" autocapitalize="off"><input type="text" id="xr" placeholder="Перевод"><button class="b" onclick="__addX()">Добавить слово</button><small id="xm"></small>
-        <div class="wlist" id="wlist"></div>
-      </div>
-    `;
+        <div class="wlist" id="wlist"></div></div>`;
     renderWords();
     updateSelInfo();
     if(SHOW_AVA) renderAvaP2();
   }
   function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-
   function labelForBlk(blk){
     if(blk==="")return "— не сортировано";
     if(blk.startsWith("c:")){const b=CUSTOM.find(x=>x.id===blk.slice(2));return "📁 "+(b?b.name:"Без названия")}
@@ -1223,15 +1158,8 @@ window.__startApp = function(){
     };
     const withIdx=X.map((w,idx)=>({w,idx}));
     const groups=new Map();
-    for(const it of withIdx){
-      const blk=it.w.blk||"";
-      if(!groups.has(blk))groups.set(blk,[]);
-      groups.get(blk).push(it);
-    }
-    const keys=[...groups.keys()].sort((a,b)=>{
-      if(a==="")return -1; if(b==="")return 1;
-      return labelForBlk(a).localeCompare(labelForBlk(b),"ru");
-    });
+    for(const it of withIdx){const blk=it.w.blk||"";if(!groups.has(blk))groups.set(blk,[]);groups.get(blk).push(it);}
+    const keys=[...groups.keys()].sort((a,b)=>{if(a==="")return -1;if(b==="")return 1;return labelForBlk(a).localeCompare(labelForBlk(b),"ru")});
     let html="";
     for(const key of keys){
       const arr=groups.get(key).slice().reverse();
@@ -1240,57 +1168,53 @@ window.__startApp = function(){
         <span class="big">${w.h}</span>
         <span class="tt"><small>${w.s.map(mark).join(" ")}</small> — ${w.ru}</span>
         <select onchange="__moveWord(${idx},this.value)">${blocksOpts(w.blk||"")}</select>
-        <button onclick="__delWord(${idx})">✕</button>
-      </div>`).join("");
+        <button onclick="__delWord(${idx})">✕</button></div>`).join("");
     }
     el.innerHTML=html;
   }
 
-  window.__setMixed = v=>{mixed=v;};
-  window.__moveWord = (idx,blk)=>{if(!X[idx])return;X[idx].blk=blk;sv();home()};
-  window.__delWord = idx=>{if(!X[idx])return;X.splice(idx,1);sv();home()};
-  window.__addBlock = ()=>{const n=document.getElementById("bn").value.trim();if(!n)return;const id=Date.now().toString(36)+Math.random().toString(36).slice(2,5);CUSTOM.push({id,name:n});sv();home()};
-  window.__delBlock = id=>{
+  window.__setMixed=v=>{mixed=v};
+  window.__moveWord=(idx,blk)=>{if(!X[idx])return;X[idx].blk=blk;sv();window.__home()};
+  window.__delWord=idx=>{if(!X[idx])return;X.splice(idx,1);sv();window.__home()};
+  window.__addBlock=()=>{const n=document.getElementById("bn").value.trim();if(!n)return;const id=Date.now().toString(36)+Math.random().toString(36).slice(2,5);CUSTOM.push({id,name:n});sv();window.__home()};
+  window.__delBlock=id=>{
     const b=CUSTOM.find(x=>x.id===id);if(!b)return;
     if(!confirm("Удалить блок «"+(b.name||"Без названия")+"»? Все его слова станут нерассортированными."))return;
     CUSTOM=CUSTOM.filter(x=>x.id!==id);
-    const key="c:"+id;
-    X.forEach(w=>{if((w.blk||"")===key)w.blk=""});
-    SEL.delete("m:"+key);
-    sv();home();
+    const key="c:"+id;X.forEach(w=>{if((w.blk||"")===key)w.blk=""});
+    SEL.delete("m:"+key);sv();window.__home();
   };
-  window.__moveBlock = (id,dir)=>{
+  window.__moveBlock=(id,dir)=>{
     const i=CUSTOM.findIndex(b=>b.id===id);if(i<0)return;
     const j=i+dir;if(j<0||j>=CUSTOM.length)return;
-    [CUSTOM[i],CUSTOM[j]]=[CUSTOM[j],CUSTOM[i]];sv();home();
+    [CUSTOM[i],CUSTOM[j]]=[CUSTOM[j],CUSTOM[i]];sv();window.__home();
   };
-  window.__addX = ()=>{
+  window.__addX=()=>{
     const h=document.getElementById("xh").value.trim();
     const p=document.getElementById("xp").value.trim().toLowerCase().split(/\s+/);
     const r=document.getElementById("xr").value.trim();
     const m=document.getElementById("xm");
-    if(!h||!r||p.length!=[...h].length||!p.every(x=>/^[a-z]+[0-4]$/.test(x))){m.textContent="Проверь: слогов должно быть столько же, сколько иероглифов, у каждого цифра тона 0–4.";return}
-    X.push({h,s:p,ru:r,pos:"доп.",blk:""});sv();home();
+    if(!h||!r||p.length!=[...h].length||!p.every(x=>/^[a-z]+[0-4]$/.test(x))){m.textContent="Проверь: слогов столько же, сколько иероглифов, у каждого цифра тона 0–4.";return}
+    X.push({h,s:p,ru:r,pos:"доп.",blk:""});sv();window.__home();
   };
-  window.__goBlock = blk=>{
+  window.__goBlock=blk=>{
     const list=blk===""?myUnsorted():wordsInBlock(blk);
     if(!list.length){alert("В этом блоке пока нет слов.");return}
-    go(list);
+    window.__go(list);
   };
-  window.__toggleSel = (key,on)=>{if(on)SEL.add(key);else SEL.delete(key);sv();updateSelInfo()};
-  window.__markAll = ()=>{
+  window.__toggleSel=(key,on)=>{if(on)SEL.add(key);else SEL.delete(key);sv();updateSelInfo()};
+  window.__markAll=()=>{
     const all=document.querySelectorAll("input[data-sel]");
     const anyUn=Array.from(all).some(c=>!c.checked);
     all.forEach(c=>{if(c.disabled)return;c.checked=anyUn;const k=c.dataset.sel;if(anyUn)SEL.add(k);else SEL.delete(k)});
     sv();updateSelInfo();
   };
-  window.__goSelected = ()=>{
+  window.__goSelected=()=>{
     const w=selectedWords();
     if(!w.length){alert("Выберите хотя бы один блок.");return}
-    go(w);
+    window.__go(w);
   };
-  window.__logout = async ()=>{try{await window.FB.signOut(window.FB.auth)}catch(e){}};
-  window.__openAvatarPicker = openAvatarPicker;
+  window.__logout=async()=>{try{await window.FB.signOut(window.FB.auth)}catch(e){}};
 
   function selectedWords(){
     let list=[];
@@ -1311,7 +1235,6 @@ window.__startApp = function(){
     if(!w.length){el.textContent="Ничего не выбрано — отметьте блоки флажками слева.";return}
     el.textContent=`Выбрано слов: ${w.length} (из них выучено: ${w.filter(lr).length})`;
   }
-
   function all0(){
     let a=[];for(let n=1;n<=20;n++)a=a.concat(lw(n),extraFromX(n,false),extraFromX(n,true));
     a=a.concat(X);
@@ -1320,61 +1243,47 @@ window.__startApp = function(){
     return out;
   }
 
-  window.__go = list=>{const c=document.getElementById("mx");if(c)mixed=c.checked;L=mixed?sh(list):list.slice();i=0;sc=0;wr=[];fromRepeat=false;show()};
-  window.__goRepeat = ()=>{if(!R.length)return;L=R.map(h=>allWords().find(w=>w.h===h)||{h,s:[],ru:"?"});i=0;sc=0;wr=[];fromRepeat=true;show()};
-  function allWords(){return all0()}
+  window.__go=list=>{const c=document.getElementById("mx");if(c)mixed=c.checked;L=mixed?sh(list):list.slice();i=0;sc=0;wr=[];fromRepeat=false;window.__show()};
+  window.__goRepeat=()=>{if(!R.length)return;L=R.map(h=>all0().find(w=>w.h===h)||{h,s:[],ru:"?"});i=0;sc=0;wr=[];fromRepeat=true;window.__show()};
 
   function show(){
     const w=L[i];done=false;self=null;
     const hzHidden=!!HIDE.hz, cvHidden=!!HIDE.cv;
-
     $.innerHTML=`<div class="m"><span>${i+1} / ${L.length}</span><span>верно: ${sc}</span></div>
     <div class="bar"><i style="width:${i/L.length*100}%"></i></div>
     <div class="q">${w.ru}</div>
     <div class="m"><span>${w.pos||"выражение"}</span><span>слогов: ${w.s.length}</span></div>
-
     <div class="inpwrap" id="hzRow" style="${hzHidden?"display:none":""}">
       <input type="text" id="hz" class="hz" placeholder="Иероглифы" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-      <button class="mini" title="Скрыть поле иероглифов" onclick="__hideBox('hz',true)">👁</button>
-    </div>
+      <button class="mini" title="Скрыть поле иероглифов" onclick="__hideBox('hz',true)">👁</button></div>
     ${hzHidden?`<div class="hiddenRow"><button onclick="__hideBox('hz',false)">🙈 Показать поле иероглифов</button></div>`:""}
-
     <div class="cvrow" id="cvRow" style="${cvHidden?"display:none":""}">
-      <div class="cvbox">
-        <canvas id="cv" style="height:${ZOOM}px"></canvas>
-        <div class="rz" id="rz" title="Потяните, чтобы изменить размер">⤡</div>
-      </div>
-      <button class="mini" title="Скрыть окно рисования" onclick="__hideBox('cv',true)">👁</button>
-    </div>
+      <div class="cvbox"><canvas id="cv" style="height:${ZOOM}px"></canvas>
+        <div class="rz" id="rz" title="Потяните, чтобы изменить размер">⤡</div></div>
+      <button class="mini" title="Скрыть окно рисования" onclick="__hideBox('cv',true)">👁</button></div>
     <div class="tools" id="cvTools" style="${cvHidden?"display:none":""}"><button onclick="__clr()">Очистить рисунок</button></div>
     ${cvHidden?`<div class="hiddenRow"><button onclick="__hideBox('cv',false)">🙈 Показать окно рисования</button></div>`:""}
-
     <div class="inpwrap" style="margin-top:6px">
-      <input type="text" id="py" placeholder="Пиньинь: ni3 hao3 / nǐ hǎo / ni hao (нулевой тон можно без 0)" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-    </div>
-
-    <div id="fb"></div>
-    <div class="row" id="actions"></div>`;
+      <input type="text" id="py" placeholder="Пиньинь: ni3 hao3 / nǐ hǎo / ni hao (нулевой тон можно без 0)" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+    <div id="fb"></div><div class="row" id="actions"></div>`;
     paintActions();
-    if(!cvHidden)initCv();else {cv=null;cvReady=false;cx=null}
+    if(!cvHidden)initCv();else{cv=null;cvReady=false;cx=null}
     if(!cvHidden)initResize();
   }
+  window.__show=show;
+  window.__home=home;
 
-  window.__hideBox = (k,on)=>{HIDE[k]=on;sv();show()};
-
+  window.__hideBox=(k,on)=>{HIDE[k]=on;sv();window.__show()};
   function paintActions(){
     const a=document.getElementById("actions");
     if(!a)return;
-    if(!done){
-      a.innerHTML=`<button class="b p" style="margin:0" onclick="__check()">Проверить</button>`;
-    }else{
-      const w=L[i];
-      const inR=R.includes(w.h);
+    if(!done){a.innerHTML=`<button class="b p" style="margin:0" onclick="__check()">Проверить</button>`;}
+    else{
+      const w=L[i];const inR=R.includes(w.h);
       a.innerHTML=`<button class="b" style="margin:0" onclick="__toRepeat()" ${inR?"disabled":""}>${inR?"Уже в повторялке":"Закинуть в повторялку"}</button>
       <button class="b p" style="margin:0" onclick="__nx()">${i+1<L.length?"Дальше":"Результат"}</button>`;
     }
   }
-
   function initCv(){
     cv=document.getElementById("cv");
     if(!cv){cvReady=false;return}
@@ -1387,20 +1296,17 @@ window.__startApp = function(){
     cv.onpointermove=e=>{if(!dr)return;const[x,y]=pt(e);cx.lineTo(x,y);cx.stroke()};
     cv.onpointerup=cv.onpointercancel=()=>{dr=false};
   }
-  window.__clr = ()=>{if(cx&&cv)cx.clearRect(0,0,cv.width,cv.height)};
-
+  window.__clr=()=>{if(cx&&cv)cx.clearRect(0,0,cv.width,cv.height)};
   let rzStart=null;
   function initResize(){
-    const h=document.getElementById("rz");
-    if(!h)return;
+    const h=document.getElementById("rz");if(!h)return;
     h.onpointerdown=e=>{
       e.preventDefault();h.setPointerCapture(e.pointerId);
       rzStart={y:e.clientY,h:cv.getBoundingClientRect().height};
       h.onpointermove=ev=>{
         if(!rzStart)return;
         const nh=Math.max(80,Math.min(700,rzStart.h+(ev.clientY-rzStart.y)));
-        ZOOM=Math.round(nh);
-        cv.style.height=ZOOM+"px";
+        ZOOM=Math.round(nh);cv.style.height=ZOOM+"px";
         const d=devicePixelRatio||1;const r=cv.getBoundingClientRect();
         cv.width=r.width*d;cv.height=r.height*d;
         cx=cv.getContext("2d");cx.scale(d,d);cx.lineWidth=5;cx.lineCap="round";cx.lineJoin="round";cx.strokeStyle=getComputedStyle(document.body).color;
@@ -1409,82 +1315,58 @@ window.__startApp = function(){
     };
   }
 
-  window.__check = ()=>{
+  window.__check=()=>{
     const w=L[i];done=true;
     const hzEl=document.getElementById("hz"),pyEl=document.getElementById("py");
-    const hzRaw=hzEl?hzEl.value:"";
-    const pyRaw=pyEl?pyEl.value:"";
-
-    let hzOK=null;
-    if(hzRaw.trim()){hzOK=normHz(hzRaw)===normHz(w.h)}
-
+    const hzRaw=hzEl?hzEl.value:"";const pyRaw=pyEl?pyEl.value:"";
+    let hzOK=null;if(hzRaw.trim())hzOK=normHz(hzRaw)===normHz(w.h);
     let pyOK=null,pyNoTone=false;
     if(pyRaw.trim()){
-      const target=norm(w.s.join(" "));
-      const got=norm(pyRaw);
-      if(got===target){pyOK=true}
-      else if(stripZero(got)===stripZero(target)){pyOK=true}
+      const target=norm(w.s.join(" "));const got=norm(pyRaw);
+      if(got===target)pyOK=true;
+      else if(stripZero(got)===stripZero(target))pyOK=true;
       else if(noTone(got)===noTone(target)){pyOK=true;pyNoTone=true}
       else pyOK=false;
     }
-
     const drawn=cv&&cvReady&&!HIDE.cv;
-    let ok;
-    if(hzOK===null&&pyOK===null){ok=null}
-    else{ok=(hzOK!==false)&&(pyOK!==false)}
+    let ok;if(hzOK===null&&pyOK===null)ok=null;else ok=(hzOK!==false)&&(pyOK!==false);
     self=null;
-
     if(hzEl){hzEl.classList.remove("ok","no");if(hzOK===true)hzEl.classList.add("ok");else if(hzOK===false)hzEl.classList.add("no");hzEl.disabled=true}
     if(pyEl){pyEl.classList.remove("ok","no");if(pyOK===true)pyEl.classList.add("ok");else if(pyOK===false)pyEl.classList.add("no");pyEl.disabled=true}
-
     let fb="";
     if(hzOK!==null||pyOK!==null){
       const pyRight=w.s.map(mark).join(" ");
       fb+=`<div class="res">
-        <div class="ansbox ${hzOK===true?"ok":hzOK===false?"no":""}">
-          <small>Иероглифы</small><br>
+        <div class="ansbox ${hzOK===true?"ok":hzOK===false?"no":""}"><small>Иероглифы</small><br>
           ${hzRaw.trim()?`<span style="text-decoration:${hzOK===false?"line-through":"none"}">${normHz(hzRaw)}</span>`:`<span class="tiny">—</span>`}
-          ${hzOK===false?`<span class="arrow">→</span><b>${w.h}</b>`:""}
-          ${hzOK===true?" ✓":""}
-        </div>
-        <div class="ansbox ${pyOK===true?"ok":pyOK===false?"no":""}">
-          <small>Пиньинь</small><br>
+          ${hzOK===false?`<span class="arrow">→</span><b>${w.h}</b>`:""}${hzOK===true?" ✓":""}</div>
+        <div class="ansbox ${pyOK===true?"ok":pyOK===false?"no":""}"><small>Пиньинь</small><br>
           ${pyRaw.trim()?`<span style="text-decoration:${pyOK===false?"line-through":"none"}">${pyRaw.trim()}</span>`:`<span class="tiny">—</span>`}
-          ${pyOK===false?`<span class="arrow">→</span><b>${pyRight}</b>`:""}
-          ${pyOK===true?(pyNoTone?" ✓ (тоны не проверены)":" ✓"):""}
-        </div>
-      </div>`;
+          ${pyOK===false?`<span class="arrow">→</span><b>${pyRight}</b>`:""}${pyOK===true?(pyNoTone?" ✓ (тоны не проверены)":" ✓"):""}</div></div>`;
     }
     if(ok===null&&drawn){
       fb+=`<div class="r" style="border:1px solid var(--bd)">Ответ: <span class="big">${w.h}</span><br><b>${w.s.map(mark).join(" ")}</b>
       <div class="row" style="margin-top:8px">
         <button class="b" style="margin:0" onclick="__selfAns(false)">Нет</button>
-        <button class="b p" style="margin:0" onclick="__selfAns(true)">Верно</button>
-      </div></div>`;
-    }else if(ok===null&&!drawn){
-      fb+=`<div class="r no">Введите ответ или нарисуйте иероглиф.</div>`;
-    }
+        <button class="b p" style="margin:0" onclick="__selfAns(true)">Верно</button></div></div>`;
+    }else if(ok===null&&!drawn){fb+=`<div class="r no">Введите ответ или нарисуйте иероглиф.</div>`;}
     document.getElementById("fb").innerHTML=fb;
     paintActions();
   };
-
-  window.__selfAns = v=>{
+  window.__selfAns=v=>{
     self=v;const w=L[i];const ok=(self===true);
     const q=P[w.h]||{s:0};q.s=ok?q.s+1:0;P[w.h]=q;
-    if(ok){sc++}else{wr.push(w)}
-    sv();
-    paintActions();
+    if(ok)sc++;else wr.push(w);
+    sv();paintActions();
     document.querySelectorAll("#fb .row button").forEach(b=>b.disabled=true);
   };
-  window.__toRepeat = ()=>{const w=L[i];if(!R.includes(w.h)){R.push(w.h);sv()}paintActions()};
-  window.__nx = ()=>{
-    const w=L[i];
-    if(!done)return;
+  window.__toRepeat=()=>{const w=L[i];if(!R.includes(w.h)){R.push(w.h);sv()}paintActions()};
+  window.__nx=()=>{
+    const w=L[i];if(!done)return;
     if(self===null){
       let hzOK=null,pyOK=null;
       const hzEl=document.getElementById("hz"),pyEl=document.getElementById("py");
-      const hzRaw=hzEl?hzEl.value:"";
-      const pyRaw=pyEl?pyEl.value:"";
+      const hzRaw=hzEl?hzEl.value:"";const pyRaw=pyEl?pyEl.value:"";
       if(hzRaw.trim())hzOK=normHz(hzRaw)===normHz(w.h);
       if(pyRaw.trim()){
         const target=norm(w.s.join(" "));const got=norm(pyRaw);
@@ -1495,16 +1377,15 @@ window.__startApp = function(){
       }
       const ok=(hzOK!==false)&&(pyOK!==false)&&(hzOK!==null||pyOK!==null);
       const q=P[w.h]||{s:0};q.s=ok?q.s+1:0;P[w.h]=q;
-      if(ok){sc++}else{wr.push(w)}
+      if(ok)sc++;else wr.push(w);
       sv();
       if(ok&&fromRepeat){R=R.filter(h=>h!==w.h);sv()}
     }
     i++;
-    i<L.length?show():end();
+    i<L.length?window.__show():end();
   };
-
   function end(){
-    $.innerHTML=`<h1>Результат: ${sc} из ${L.length}</h1>${wr.length?`<p>Повтори эти слова:</p>`+wr.map(w=>`<div class="r no"><span class="big">${w.h}</span> ${w.s.map(mark).join(" ")}<br>${w.ru}</div>`).join("")+`<button class="b p" onclick="__go(wr.slice())">Повторить ошибки</button>`:`<p>Без ошибок! 🎉</p>`}<button class="b" onclick="home()">В начало</button>`;
+    $.innerHTML=`<h1>Результат: ${sc} из ${L.length}</h1>${wr.length?`<p>Повтори эти слова:</p>`+wr.map(w=>`<div class="r no"><span class="big">${w.h}</span> ${w.s.map(mark).join(" ")}<br>${w.ru}</div>`).join("")+`<button class="b p" onclick="__go(wr.slice())">Повторить ошибки</button>`:`<p>Без ошибок! 🎉</p>`}<button class="b" onclick="__home()">В начало</button>`;
   }
 
   const CH=["零","一","二","三","四","五","六","七","八","九"];
@@ -1524,7 +1405,7 @@ window.__startApp = function(){
    if(d[3])t.push([CH[d[3]]]);
    let v=[[]];t.forEach(o=>{v=v.flatMap(a=>o.map(x=>[...a,x]))});return v}
   let ND="cz",NS="d",nN=0,nOk=0,nTot=0,nDone=false;
-  window.__numHome = ()=>{nOk=0;nTot=0;nNew()};
+  window.__numHome=()=>{nOk=0;nTot=0;nNew()};
   function nNew(){nN=1000+Math.floor(Math.random()*9000);nDone=false;nShow()}
   window.__nSet=x=>{ND=x;nNew()};
   window.__nStyle=x=>{NS=x;nNew()};
@@ -1536,21 +1417,20 @@ window.__startApp = function(){
     <div class="tn" style="margin:10px 0"><button class="${cz?"on":""}" onclick="__nSet('cz')">Кит → рус</button><button class="${cz?"":"on"}" onclick="__nSet('rz')">Рус → кит</button></div>
     ${cz?"":`<div class="tn" style="margin-bottom:6px"><button class="${NS=="d"?"on":""}" onclick="__nStyle('d')">Цифрами</button><button class="${NS=="w"?"on":""}" onclick="__nStyle('w')">Словами</button></div>`}
     ${q}
-    <input type="text" id="na" placeholder="${cz?"Число цифрами":"Иероглифы или пиньинь (yi1 qian1 …)"}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-    <div id="nfb"></div><button class="b p" id="nb" onclick="__nCheck()">Проверить</button><button class="b" onclick="home()">В начало</button>`;
+    <input type="text" id="na" placeholder="${cz?"Число цифрами":"Иероглифы или пиньинь"}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <div id="nfb"></div><button class="b p" id="nb" onclick="__nCheck()">Проверить</button><button class="b" onclick="__home()">В начало</button>`;
     const a=document.getElementById("na");a.onkeydown=e=>{if(e.key=="Enter")nDone?nNew():__nCheck()};a.focus();
   }
-  window.__nHint = ()=>{const v=zhVariants(nN)[0];document.getElementById("nhint").innerHTML=`<div class="r" style="border:1px solid var(--bd)">${v.map(c=>mark(PY[c])).join(" ")}</div>`};
-  window.__nCheck = ()=>{
+  window.__nHint=()=>{const v=zhVariants(nN)[0];document.getElementById("nhint").innerHTML=`<div class="r" style="border:1px solid var(--bd)">${v.map(c=>mark(PY[c])).join(" ")}</div>`};
+  window.__nCheck=()=>{
     if(nDone)return;const a=document.getElementById("na"),raw=a.value.trim();if(!raw)return;
     const vs=zhVariants(nN);let ok=false,note="";
     if(ND=="cz"){ok=raw.replace(/[\s,.]/g,"")===String(nN)}
     else if(/[\u4e00-\u9fff]/.test(raw)){const t=raw.replace(/\s/g,"");ok=vs.some(x=>x.join("")===t)}
     else{
-      const got=norm(raw);
-      const targets=vs.map(x=>norm(x.map(c=>PY[c]).join(" ")));
-      if(targets.some(t=>t===got)){ok=true}
-      else if(targets.some(t=>stripZero(t)===stripZero(got))){ok=true}
+      const got=norm(raw);const targets=vs.map(x=>norm(x.map(c=>PY[c]).join(" ")));
+      if(targets.some(t=>t===got))ok=true;
+      else if(targets.some(t=>stripZero(t)===stripZero(got)))ok=true;
       else if(targets.some(t=>noTone(t)===noTone(got))){ok=true;note="тоны не проверены"}
       else ok=false;
     }
@@ -1574,7 +1454,7 @@ window.__startApp = function(){
     }
   });
 };
-</script>
+  </script>
 
 <script>
 (function waitStart(){
