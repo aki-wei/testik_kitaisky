@@ -49,7 +49,6 @@ const RV={};
 for(const b in M){[...M[b]].forEach((ch,k)=>{RV[ch]=b+(k+1)})}
 function mark(s){const t=+s.slice(-1),b=s.slice(0,-1);if(!t)return b;let k=b.search(/[ae]/);if(k<0&&b.includes("ou"))k=b.indexOf("o");if(k<0){for(let j=b.length-1;j>=0;j--)if("iouv".includes(b[j])){k=j;break}}return b.slice(0,k)+M[b[k]][t-1]+b.slice(k+1)}
 
-/* нормализация: убираем пробелы/дефисы/апострофы, тоны-знаки -> цифры, ü->v, 5->0, lower */
 function norm(s){
   s=String(s).toLowerCase().replace(/[uü]/g,"v");
   let out="";
@@ -60,15 +59,10 @@ function norm(s){
   out=out.replace(/5/g,"0");
   return out;
 }
-/* убираем нулевой тон (0) — его можно не писать: xi == xi0 */
 function stripZero(s){return s.replace(/0/g,"")}
-/* убираем все цифры тонов — для проверки «без тонов» */
 function noTone(s){return s.replace(/[0-9]/g,"")}
-/* иероглифы без пробелов */
 function normHz(s){return String(s).replace(/\s+/g,"")}
-/* содержит ли строка иероглифы */
 function hasHz(s){return /[\u4e00-\u9fff]/.test(s)}
-/* содержит ли строка латиницу/цифры (пиньинь) */
 function hasPy(s){return /[a-zA-Zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü]/.test(s)}
 
 const $=document.getElementById("app");
@@ -760,8 +754,13 @@ const XB=mk(`日本|ri4 ben3|Япония|страна|0
 七|qi1|семь|число|0`);
 XB.forEach(w=>{if(!X.some(x=>x.h===w.h))X.push(w)});sv();
 
-const XG={18:X18,19:X19a.concat(X19b),20:X20};
-const lw=n=>n=="x"?X:(LW[n]||[]);
+/* объединённый список слов урока (базовые + доп.) */
+function lw(n){
+  if(n==18)return LW[18].concat(X18);
+  if(n==19)return LW[19].concat(X19a, X19b);
+  if(n==20)return LW[20].concat(X20);
+  return LW[n]||[];
+}
 const lr=w=>(P[w.h]&&P[w.h].s>=2);
 const LV=[150,300,600,1200];
 
@@ -773,10 +772,8 @@ let cv,cx,dr=false,cvReady=false;
 function home(){
  let all=[];for(let n=1;n<=20;n++)all=all.concat(lw(n));all=all.concat(X);
  const k=all.filter(lr).length;let v=0;LV.forEach((t,j)=>{if(k>=t)v=j+1});const nx=LV[v],pc=v<4?Math.round(k/nx*100):100;
- const ls=T.slice(0,20).map((t,j)=>{const n=j+1,w=lw(n),d=w.filter(lr).length;let extra="";
-   if(XG[n]){const d2=XG[n].filter(lr).length;extra=`<br><small style="color:var(--ac)">доп: ${d2}/${XG[n].length}</small>`}
-   return w.length?`<button class="b ls" onclick="go(lw(${n}))"><span><b>${n}.</b> ${t}${extra}</span><small>${d}/${w.length}</small></button>`:`<div class="b ls dis"><span><b>${n}.</b> ${t}</span><small>слов пока нет</small></div>`}).join("");
- const xs=[18,19,20].map(n=>{const g=XG[n],d=g.filter(lr).length;return `<button class="b ls" onclick="go(XG[${n}])"><span>Доп. слова к уроку ${n}</span><small>${d}/${g.length}</small></button>`}).join("");
+ const ls=T.slice(0,20).map((t,j)=>{const n=j+1,w=lw(n),d=w.filter(lr).length;
+   return w.length?`<button class="b ls" onclick="go(lw(${n}))"><span><b>${n}.</b> ${t}</span><small>${d}/${w.length}</small></button>`:`<div class="b ls dis"><span><b>${n}.</b> ${t}</span><small>слов пока нет</small></div>`}).join("");
  const rep=R.length?`<button class="b ls" style="border-color:var(--ac)" onclick="goRepeat()"><span>🔁 Повторялка</span><small>${R.length}</small></button>`:"";
  $.innerHTML=`<h1>Тренажёр иероглифов 汉字</h1>
  <div class="hs"><b>Выучено слов: ${k} из ${all.length}</b><div class="pb"><i style="width:${all.length?Math.round(k/all.length*100):0}%"></i></div><small>Слово считается выученным после двух верных ответов подряд.</small></div>
@@ -785,7 +782,6 @@ function home(){
  <button class="b p" onclick="go(all0())">Все слова</button><button class="b" onclick="go(all0().filter(w=>!lr(w)))">Только невыученные</button>
  ${rep}
  ${ls}
- <div class="hs"><b>Доп. слова по урокам</b>${xs}</div>
  <div class="hs"><b>Доп. слова${X.length?" ("+X.length+")":""}</b>${X.length?`<button class="b ls" onclick="go(X)"><span>Тренировать</span><small>${X.filter(lr).length}/${X.length}</small></button>`:""}
  <input type="text" id="xh" placeholder="Иероглифы"><input type="text" id="xp" placeholder="Пиньинь с цифрами: xi2 guan4" autocapitalize="off"><input type="text" id="xr" placeholder="Перевод"><button class="b" onclick="addX()">Добавить</button><small id="xm"></small></div>
  <div class="hs"><b>Настройки</b>
@@ -806,7 +802,7 @@ function applyZoom(){if(cv){const r=cv.getBoundingClientRect();const d=devicePix
 /* ===================== сессия ===================== */
 function go(list){const c=document.getElementById("mx");if(c)mixed=c.checked;L=mixed?sh(list):list.slice();i=0;sc=0;wr=[];fromRepeat=false;show()}
 function goRepeat(){if(!R.length)return;L=R.map(h=>allWords().find(w=>w.h===h)||{h,s:[],ru:"?"});i=0;sc=0;wr=[];fromRepeat=true;show()}
-function allWords(){let a=all0();return a}
+function allWords(){return all0()}
 
 function show(){
  const w=L[i];done=false;self=null;
@@ -859,12 +855,8 @@ function check(){
  const hzIn=hasHz(raw);
  const pyIn=hasPy(raw);
 
- /* иероглифы */
  let hzOK=null;
- if(hzIn){
-   hzOK=normHz(raw)===normHz(w.h);
- }
- /* пиньинь */
+ if(hzIn){hzOK=normHz(raw)===normHz(w.h)}
  let pyOK=null,pyNoTone=false;
  if(pyIn){
    const target=norm(w.s.join(" "));
@@ -874,17 +866,12 @@ function check(){
    else if(noTone(got)===noTone(target)){pyOK=true;pyNoTone=true}
    else pyOK=false;
  }
- /* итог */
  const drawn=cv&&cvReady&&!HIDE.cv;
  let ok;
- if(hzOK===null&&pyOK===null){
-   ok=null;
- }else{
-   ok=(hzOK!==false)&&(pyOK!==false);
- }
+ if(hzOK===null&&pyOK===null){ok=null}
+ else{ok=(hzOK!==false)&&(pyOK!==false)}
  self=null;
 
- /* подсветка поля */
  if(inp){
    inp.classList.remove("ok","no");
    if(ok===true)inp.classList.add("ok");
@@ -892,7 +879,6 @@ function check(){
    inp.disabled=true;
  }
 
- /* блок результата */
  let fb="";
  if(hzOK!==null||pyOK!==null){
    const hzRight=w.h, pyRight=w.s.map(mark).join(" ");
