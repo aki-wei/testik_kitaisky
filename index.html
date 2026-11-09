@@ -75,8 +75,10 @@ canvas{width:100%;height:170px;min-height:80px;background:var(--card);border:1px
 .topbar .info small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .iconbtn{border:none;background:transparent;padding:2px 4px;font-size:14px;color:var(--mu);cursor:pointer;flex:none}
 .delbtn{border:1px solid var(--no);background:transparent;color:var(--no);border-radius:9px;padding:6px 8px;font-size:16px;line-height:1;flex:none}
+.uploadLbl{display:block;text-align:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;cursor:pointer;margin:0;color:var(--tx)}
+.tn button{flex:1;padding:9px 0;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx)}
+.tn .on{background:var(--ac)!important;color:#fff!important;border-color:var(--ac)!important}
 </style></head><body><div id="app"></div>
-
 <script type="module">
 /* ==================== FIREBASE ==================== */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
@@ -136,6 +138,7 @@ window.__startApp = function(){
   let CURRENT_USER=null;
   let CURRENT_AVATAR="";
   let CURRENT_NICK="";
+  let SHOW_AVA=false;
   let SAVE_TIMER=null;
 
   function sv(){
@@ -182,8 +185,7 @@ window.__startApp = function(){
 
   const mk=t=>t.split("\n").filter(Boolean).map(l=>{const p=l.split("|");return{h:p[0],s:p[1].split(" "),ru:p[2],pos:p[3],l:+p[4]||0}});
   const T=["你好","你是哪国人","那是你的书吗","图书馆在哪儿","清华大学在哪儿","现在几点","明天你有课吗","你的电话号码是多少","多少钱一本","你家有几口人","北京的冬天比较冷","在干什么呢","我打算去商店买东西","你喜欢什么颜色的","明天是我朋友的生日","周末你干什么","做客（一）","做客（二）","早睡早起比较好啊","看病人","中国朋友太热情了","他感冒了","你学了多长时间汉语","明天见","你得多锻炼锻炼了","快考试了","爸爸妈妈让我回家","考得怎么样","你什么时候去旅行","我要参加联欢会"];
-
-  const LW={1:mk(`你好|ni3 hao3|здравствуйте, привет||1
+    const LW={1:mk(`你好|ni3 hao3|здравствуйте, привет||1
 好|hao3|хороший|прил.|1
 你|ni3|ты|мест.|1
 是|shi4|быть, являться; да (в ответах)|гл.|1
@@ -605,8 +607,7 @@ window.__startApp = function(){
 病人|bing4 ren2|больной, пациент|сущ.|3
 身体|shen1 ti3|тело, здоровье|сущ.|2
 药|yao4|лекарство|сущ.|2`)};
-
-  const X18=mk(`故事|gu4 shi4|сказание; сказка; рассказ; история|сущ.|0
+    const X18=mk(`故事|gu4 shi4|сказание; сказка; рассказ; история|сущ.|0
 历史|li4 shi3|история; исторический|сущ.|0
 宝贝|bao3 bei4|сокровище, деточка, дорогой|сущ.|0
 线上|xian4 shang4|онлайн|нареч.|0
@@ -856,7 +857,7 @@ window.__startApp = function(){
 
     const COUNTRIES=new Set(["日本","中国","法国","西班牙","巴西","俄罗斯","英国","德国","意大利","白俄罗斯","土耳其","美国","韩国","朝鲜","加拿大","澳大利亚","印度","泰国","越南","蒙古","哈萨克斯坦","乌克兰","比利时"]);
     const COLORS=new Set(["红","紫","棕","橙","粉红","金色","银色","白","黑","灰","蓝","绿","黄","色"]);
-    const FOOD=new Set(["苹果","香蕉","葡萄","西瓜","可可","可乐","百事可乐","肉","牛肉","羊肉","马肉","猪肉","鸡肉","米饭","面条儿","饺子","巧克力","蛋糕","甜","汤","茶","果汁","咖啡","啤酒","水","汽水","雪碧","七喜","芬达","美年达","汉堡","汉堡王","肯德基","芝士","芝士汉堡","薯条","快餐","炒","烤","炸","菜","米饭","面食","食品","馅儿"]);
+    const FOOD=new Set(["苹果","香蕉","葡萄","西瓜","可可","可乐","百事可乐","肉","牛肉","羊肉","马肉","猪肉","鸡肉","米饭","面条儿","饺子","巧克力","蛋糕","甜","汤","茶","果汁","咖啡","啤酒","水","汽水","雪碧","七喜","芬达","美年达","汉堡","汉堡王","肯德基","芝士","芝士汉堡","薯条","快餐","炒","烤","炸","菜","面食","食品","馅儿"]);
     const NUMS=new Set(["零","一","二","两","三","四","五","六","七","八","九","十","百","千"]);
 
     for(const w of X){
@@ -917,7 +918,6 @@ window.__startApp = function(){
   function selKeyExtra(n){return "e"+n}
   function selKeyMy(blk){return "m:"+blk}
 
-  /* ---------- экран входа ---------- */
   const AVAS=["🐼","🐯","🐸","🐵","🦊","🐨","🐷","🐙","🐧","🦄","🐢","🦁","🐮","🐰","🐹","🐺","🐳","🐝","🦋","🐬","🐲","🍀","🌸","⭐","🌙","☀️","🌈","🍎","🍓","🍕"];
   let pickedAva="🐼";
 
@@ -1000,38 +1000,17 @@ window.__startApp = function(){
     return "Ошибка: "+code;
   }
 
-  /* ---------- смена аватарки и ника ---------- */
-  function openAvatarPicker(){
-    const wrap=document.createElement("div");
-    wrap.className="hs";
-    wrap.innerHTML=`<b>Сменить аватар</b>
-      <div class="avaP" id="avaP2"></div>
-      <div class="row" style="margin-top:6px">
-        <button class="b" style="margin:0" onclick="__uploadAvatar()">Загрузить фото</button>
-        <button class="b" style="margin:0" onclick="__closeAva()">Закрыть</button>
-      </div>
-      <input type="file" id="avaFile" accept="image/*" style="display:none" onchange="__onAvaFile(event)">`;
-    const existing=document.getElementById("avaPanel");
-    if(existing)existing.remove();
-    wrap.id="avaPanel";
-    $.prepend(wrap);
-    renderAvaP2();
-  }
+  function openAvatarPicker(){SHOW_AVA=true;home()}
   function renderAvaP2(){
     const el=document.getElementById("avaP2");
     if(!el)return;
     el.innerHTML=AVAS.map(a=>`<button class="${a===CURRENT_AVATAR?"on":""}" onclick="__setAvatarEmoji('${a}')">${a}</button>`).join("");
   }
-  window.__closeAva=()=>{const p=document.getElementById("avaPanel");if(p)p.remove()};
+  window.__closeAva=()=>{SHOW_AVA=false;home()};
   window.__setAvatarEmoji=async a=>{
     CURRENT_AVATAR=a;
-    renderAvaP2();
     await sv();
     home();
-  };
-  window.__uploadAvatar=()=>{
-    const f=document.getElementById("avaFile");
-    if(f)f.click();
   };
   window.__onAvaFile=async ev=>{
     const file=ev.target.files&&ev.target.files[0];
@@ -1050,13 +1029,13 @@ window.__startApp = function(){
         const img=new Image();
         img.onload=()=>{
           try{
-            const cv=document.createElement("canvas");
-            cv.width=size;cv.height=size;
-            const ctx=cv.getContext("2d");
+            const c=document.createElement("canvas");
+            c.width=size;c.height=size;
+            const ctx=c.getContext("2d");
             const s=Math.min(img.width,img.height);
             const sx=(img.width-s)/2, sy=(img.height-s)/2;
             ctx.drawImage(img,sx,sy,s,s,0,0,size,size);
-            resolve(cv.toDataURL("image/jpeg",quality));
+            resolve(c.toDataURL("image/jpeg",quality));
           }catch(e){reject(e)}
         };
         img.onerror=()=>reject(new Error("не удалось прочитать изображение"));
@@ -1077,28 +1056,19 @@ window.__startApp = function(){
     home();
   };
 
-  /* ---------- железобетонное удаление аккаунта ---------- */
   window.__deleteAccount=async ()=>{
     if(!CURRENT_USER)return;
     if(!confirm("Удалить аккаунт? Прогресс и настройки будут удалены."))return;
     if(!confirm("Точно удалить аккаунт? Данные не восстановить."))return;
-
     const pass = prompt("Введите пароль от аккаунта, чтобы подтвердить удаление:");
     if(pass === null) return;
     if(!pass){ alert("Пароль не введён — удаление отменено."); return; }
-
     try{
       const cred = window.FB.EmailAuthProvider.credential(CURRENT_USER.email, pass);
       await window.FB.reauthenticateWithCredential(CURRENT_USER, cred);
-
-      try{
-        await window.FB.deleteDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid));
-      }catch(e){ console.warn("firestore delete", e); }
-
+      try{await window.FB.deleteDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid));}catch(e){console.warn("firestore delete",e);}
       await window.FB.deleteUser(CURRENT_USER);
-
-      try{ await window.FB.signOut(window.FB.auth); }catch(e){}
-
+      try{await window.FB.signOut(window.FB.auth);}catch(e){}
       alert("Аккаунт удалён.");
     }catch(e){
       const code = e.code || "";
@@ -1112,7 +1082,6 @@ window.__startApp = function(){
     }
   };
 
-  /* ---------- главный экран ---------- */
   function home(){
     let all=[];
     for(let n=1;n<=20;n++)all=all.concat(lw(n));
@@ -1195,6 +1164,17 @@ window.__startApp = function(){
         <button class="b" style="width:auto;margin:0;padding:8px 12px" onclick="__logout()">Выйти</button>
         <button class="delbtn" onclick="__deleteAccount()" title="Удалить аккаунт">✕</button>
       </div>
+      ${SHOW_AVA?`<div class="hs" id="avaPanel">
+        <b>Сменить аватар</b>
+        <div class="avaP" id="avaP2"></div>
+        <div class="row" style="margin-top:6px">
+          <label class="uploadLbl" style="flex:1">
+            Загрузить фото
+            <input type="file" id="avaFile" accept="image/*" style="display:none" onchange="__onAvaFile(event)">
+          </label>
+          <button class="b" style="margin:0;flex:1" onclick="__closeAva()">Закрыть</button>
+        </div>
+      </div>`:""}
       <h1>Тренажёр иероглифов 汉字</h1>
       <button class="b p" onclick="__numHome()">🔢 Тренажёр чисел</button>
       <label><input type="checkbox" id="mx" ${mixed?"checked":""} onchange="__setMixed(this.checked)"> Перемешать слова</label>
@@ -1219,6 +1199,7 @@ window.__startApp = function(){
     `;
     renderWords();
     updateSelInfo();
+    if(SHOW_AVA) renderAvaP2();
   }
   function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
@@ -1309,6 +1290,7 @@ window.__startApp = function(){
     go(w);
   };
   window.__logout = async ()=>{try{await window.FB.signOut(window.FB.auth)}catch(e){}};
+  window.__openAvatarPicker = openAvatarPicker;
 
   function selectedWords(){
     let list=[];
