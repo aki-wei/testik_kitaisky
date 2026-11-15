@@ -165,6 +165,23 @@ window.__startApp = function(){
   }
   function stripZero(s){return s.replace(/0/g,"")}
   function normHz(s){return String(s).replace(/\s+/g,"")}
+    function tonesMatch(got, target){
+    const g = got.match(/[a-z]+[0-4]?/g) || [];
+    const t = target.match(/[a-z]+[0-4]?/g) || [];
+    if(g.length !== t.length) return false;
+    for(let k=0;k<t.length;k++){
+      const gt = g[k], tt = t[k];
+      const gNum = gt.match(/[0-4]$/);
+      const tNum = tt.match(/[0-4]$/);
+      const gSyl = gt.replace(/[0-4]$/,"");
+      const tSyl = tt.replace(/[0-4]$/,"");
+      if(gSyl !== tSyl) return false;
+      const gTone = gNum ? +gNum[0] : 0;
+      const tTone = tNum ? +tNum[0] : 0;
+      if(gTone !== tTone) return false;
+    }
+    return true;
+  }
 
   const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 
