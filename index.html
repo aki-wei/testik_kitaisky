@@ -106,6 +106,26 @@ canvas{width:100%;height:170px;min-height:80px;background:var(--card);border:1px
 .lockrow .val{font-weight:700;color:var(--ac);font-family:ui-monospace,monospace;letter-spacing:1px}
 .shoprow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed var(--bd)}
 .shoprow:last-child{border-bottom:none}
+  .friendrow .btn-add{
+  background:var(--ac);
+  color:#fff;
+  border:1px solid var(--ac);
+  border-radius:9px;
+  padding:6px 10px;
+  font-weight:600;
+  cursor:pointer;
+}
+.friendrow .btn-add:hover{ filter:brightness(0.95); }
+.friendrow .btn-del{
+  background:transparent;
+  color:var(--no);
+  border:1px solid var(--no);
+  border-radius:9px;
+  padding:6px 10px;
+  font-weight:600;
+  cursor:pointer;
+}
+.friendrow .btn-del:hover{ background:var(--nob); }
 </style></head><body><div id="app"></div>
 
 <script type="module">
@@ -1520,7 +1540,7 @@ window.__startApp = function(){
         friendCards+=`<div class="friendrow">
           <div class="ava">${av}</div>
           <div class="nm"><b>${escapeHtml(u.nick||fid)}</b><br><small>${fid}</small></div>
-          <button onclick="__removeFriend('${fid}')">Удалить</button>
+          <button class="btn-del" onclick="__removeFriend('${fid}')">Удалить</button>
         </div>`;
       }
     }else friendCards=`<div class="tiny">Пока никого.</div>`;
@@ -1563,7 +1583,7 @@ window.__startApp = function(){
       el.innerHTML=`<div class="friendrow">
         <div class="ava">${av}</div>
         <div class="nm"><b>${escapeHtml(u.nick||id)}</b><br><small>${id}</small></div>
-        <button onclick="__sendFriendRequest('${id}','${uid}')">Добавить</button>
+        <button class="btn-add" onclick="__sendFriendRequest('${id}','${uid}')">Добавить</button>
       </div>`;
     }catch(e){el.innerHTML=`<div class="tiny">Ошибка: ${escapeHtml(e.message||String(e))}</div>`}
   };
