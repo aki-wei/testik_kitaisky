@@ -1178,27 +1178,16 @@ window.__startApp = function(){
     if(!correct) return;
     rollDayIfNeeded();
     const nowLearned = lr(w);
-    // +10 за выучку — разово, не входит в дневной лимит повторов
-    if(!wasLearned && nowLearned){
-      COINS += 10;
-      return;
-    }
-    if(!wasLearned) return;  // ещё не выучено — только s растёт, монет нет
-
-    // повторение уже выученного слова
-    const cnt = DAILY_WORD_REPEATS[w.h] || 0;
-    if(cnt >= DAILY_WORD_REPEAT_LIMIT) return;  // лимит 10 повторов/день на слово
-
-    const nextCount = cnt + 1;  // номер этого повторения (1..10)
+    if(!wasLearned && nowLearned){ COINS += 10; return; }
+    if(!wasLearned) return;
+    const cnt = DAILY_WORD_REPEATS[w.h]||0;
+    if(cnt >= DAILY_WORD_REPEAT_LIMIT) return;
+    const nextCount = cnt+1;
     DAILY_WORD_REPEATS[w.h] = nextCount;
-
-    // начисление: 5-е → +5, 10-е → +10, остальные → +1
     let earned = 1;
     if(nextCount === 10) earned = 10;
     else if(nextCount === 5) earned = 5;
     COINS += earned;
-
-    // глобальный счётчик для статистики (можно оставить)
     REPEAT_COUNT++;
   }
   // ============ home ============
@@ -1929,9 +1918,11 @@ window.__startApp = function(){
     const w=L[i];
     const H=HISTORY[i]||{};
     const selfOK=(v===true);
-    // рисунок верный И пиньинь не провален
     const ok = selfOK && (H.pyOK !== false);
     const prev=H.self;
+
+    // запоминаем состояние ДО обновления s
+    const wasLearnedBefore = lr(w);
 
     const q=P[w.h]||{s:0};
     if(ok){ q.s=Math.min(2,(q.s||0)+1); } else { q.s=0; }
@@ -1946,7 +1937,7 @@ window.__startApp = function(){
 
     H.self=v;H.ok=ok;H.done=true;
     HISTORY[i]=H;
-    awardForWord(w, false, ok);
+    awardForWord(w, wasLearnedBefore, ok);  // ← передаём реальное wasLearned
     sv();
     renderResult();
     paintActions();
