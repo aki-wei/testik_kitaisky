@@ -1194,9 +1194,9 @@ window.__startApp = function(){
   function awardForWord(w, wasLearned, correct){
     if(!correct) return;
     rollDayIfNeeded();
-    const nowLearned = lr(w);
-    if(!wasLearned && nowLearned){ COINS += 10; return; }
-    if(!wasLearned) return;
+    const nowLearned = lr(w);  // уже ПОСЛЕ обновления s
+    if(!wasLearned && nowLearned){ COINS += 10; return; }  // выучка — +10 разово
+    if(!wasLearned) return;                                 // не выучено — без монет
     const cnt = DAILY_WORD_REPEATS[w.h]||0;
     if(cnt >= DAILY_WORD_REPEAT_LIMIT) return;
     const nextCount = cnt+1;
@@ -1943,7 +1943,7 @@ window.__startApp = function(){
     const ok = selfOK && (H.pyOK !== false);
     const prev=H.self;
 
-    // запоминаем состояние ДО обновления s
+    // ВАЖНО: wasLearned считаем ДО обновления s
     const wasLearnedBefore = lr(w);
 
     const q=P[w.h]||{s:0};
@@ -1959,7 +1959,7 @@ window.__startApp = function(){
 
     H.self=v;H.ok=ok;H.done=true;
     HISTORY[i]=H;
-    awardForWord(w, wasLearnedBefore, ok);  // ← передаём реальное wasLearned
+    awardForWord(w, wasLearnedBefore, ok);
     sv();
     renderResult();
     paintActions();
@@ -1970,15 +1970,11 @@ window.__startApp = function(){
     const H=HISTORY[i];
     if(!H||!H.done)return;
     if(H.self===null || H.self===undefined){
-      const wasLearned=lr(w);
+      const wasLearned=lr(w);   // здесь P[w.h] ещё не менялся (в __check не трогается)
       let ok;
-      if(H.hzOK===null && H.pyOK===null){
-        ok=false;
-      } else if(H.hzOK===null && H.pyOK!==null){
-        ok=false; // рисунок не оценён — не засчитываем
-      } else {
-        ok=(H.hzOK!==false)&&(H.pyOK!==false);
-      }
+      if(H.hzOK===null && H.pyOK===null){ ok=false; }
+      else if(H.hzOK===null && H.pyOK!==null){ ok=false; }
+      else { ok=(H.hzOK!==false)&&(H.pyOK!==false); }
       const q=P[w.h]||{s:0};q.s=ok?Math.min(2,q.s+1):0;P[w.h]=q;
       if(ok)sc++;else wr.push(w);
       H.self=ok;
