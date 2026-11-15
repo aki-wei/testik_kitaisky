@@ -1178,16 +1178,28 @@ window.__startApp = function(){
     if(!correct) return;
     rollDayIfNeeded();
     const nowLearned = lr(w);
-    if(!wasLearned && nowLearned){ COINS += 10; return; }
-    if(!wasLearned) return;
-    const cnt = DAILY_WORD_REPEATS[w.h]||0;
-    if(cnt >= DAILY_WORD_REPEAT_LIMIT) return;
-    DAILY_WORD_REPEATS[w.h] = cnt+1;
-    let earned=0;
-    REPEAT_COUNT++;
-    if(REPEAT_COUNT % 10 === 0) earned=10;
-    else if(REPEAT_COUNT % 5 === 0) earned=5;
+    // +10 за выучку — разово, не входит в дневной лимит повторов
+    if(!wasLearned && nowLearned){
+      COINS += 10;
+      return;
+    }
+    if(!wasLearned) return;  // ещё не выучено — только s растёт, монет нет
+
+    // повторение уже выученного слова
+    const cnt = DAILY_WORD_REPEATS[w.h] || 0;
+    if(cnt >= DAILY_WORD_REPEAT_LIMIT) return;  // лимит 10 повторов/день на слово
+
+    const nextCount = cnt + 1;  // номер этого повторения (1..10)
+    DAILY_WORD_REPEATS[w.h] = nextCount;
+
+    // начисление: 5-е → +5, 10-е → +10, остальные → +1
+    let earned = 1;
+    if(nextCount === 10) earned = 10;
+    else if(nextCount === 5) earned = 5;
     COINS += earned;
+
+    // глобальный счётчик для статистики (можно оставить)
+    REPEAT_COUNT++;
   }
   // ============ home ============
   function home(){
