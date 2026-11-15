@@ -13,7 +13,7 @@ h1{font-size:22px;margin:8px 0 4px}p{color:var(--mu);margin:4px 0 12px}
 button,input{font:inherit;color:inherit}button{cursor:pointer}
 .b{display:block;width:100%;text-align:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:8px 0}
 .p{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
-input[type=text],input[type=password],input[type=email]{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px;margin:4px 0;transition:border-color .15s,background .15s}
+input[type=text],input[type=password],input[type=email],input[type=number]{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px;margin:4px 0;transition:border-color .15s,background .15s}
 input[type=text].ok{border-color:var(--ok);background:var(--okb)}
 input[type=text].no{border-color:var(--no);background:var(--nob)}
 .hz{font-size:24px}
@@ -22,9 +22,11 @@ input[type=text].no{border-color:var(--no);background:var(--nob)}
 .q{font-size:21px;font-weight:600;margin:6px 0 2px}
 .r{border-radius:12px;padding:10px 12px;margin:8px 0}.ok{background:var(--okb)}.no{background:var(--nob)}
 .big{font-size:34px}
-.ls{display:flex;justify-content:space-between;gap:8px;text-align:left;align-items:center}.ls small{white-space:nowrap}.dis{opacity:.45}
-.ls .ttl{flex:1}
-.chk{display:flex;align-items:center;gap:8px;flex:1;cursor:pointer}
+.ls{display:flex;justify-content:space-between;gap:10px;text-align:left;align-items:center;box-sizing:border-box;padding:12px 14px}
+.ls small{white-space:nowrap;flex:none;min-width:44px;text-align:right;font-variant-numeric:tabular-nums}
+.ls .ttl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dis{opacity:.45}
+.chk{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}
 .chk input{width:20px;height:20px;margin:0;flex:none}
 .hs{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:10px 0}
 .pb{height:8px;background:var(--bd);border-radius:4px;margin:6px 0}.pb i{display:block;height:100%;background:var(--ok);border-radius:4px}
@@ -46,16 +48,17 @@ canvas{width:100%;height:170px;min-height:80px;background:var(--card);border:1px
 .hiddenRow{display:flex;justify-content:flex-end;margin:2px 0 6px}
 .hiddenRow button{border:1px solid var(--bd);border-radius:9px;background:var(--card);padding:6px 10px;font-size:14px;color:var(--mu)}
 .wlist{border:1px solid var(--bd);border-radius:10px;padding:6px;max-height:360px;overflow:auto;background:var(--bg)}
-.wrow{display:flex;align-items:center;gap:6px;padding:4px 2px;border-bottom:1px dashed var(--bd)}
+.wrow{display:flex;align-items:center;gap:6px;padding:4px 2px;border-bottom:1px dashed var(--bd);box-sizing:border-box}
 .wrow:last-child{border-bottom:none}
-.wrow .big{font-size:20px}
+.wrow .big{font-size:20px;flex:none}
 .wrow .tt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wrow select{max-width:150px;font:inherit;padding:4px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx)}
-.wrow button{border:1px solid var(--bd);border-radius:8px;background:var(--card);padding:4px 8px;font-size:13px}
-.blkrow{display:flex;align-items:center;gap:6px;padding:6px 2px;border-bottom:1px dashed var(--bd)}
+.wrow select{flex:none;max-width:150px;font:inherit;padding:4px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx)}
+.wrow button{flex:none;width:32px;border:1px solid var(--bd);border-radius:8px;background:var(--card);padding:4px 0;font-size:13px;text-align:center}
+.blkrow{display:flex;align-items:center;gap:6px;padding:6px 2px;border-bottom:1px dashed var(--bd);box-sizing:border-box}
 .blkrow:last-child{border-bottom:none}
-.blkrow .nm{flex:1}
-.blkrow button{border:1px solid var(--bd);border-radius:8px;background:var(--card);padding:4px 8px;font-size:13px}
+.blkrow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.blkrow button{flex:none;width:36px;min-width:36px;height:32px;padding:0;border:1px solid var(--bd);border-radius:8px;background:var(--card);font-size:14px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.blkrow button:disabled{opacity:.35}
 .grouphdr{font-size:13px;color:var(--mu);padding:6px 2px 2px}
 .topbar{display:flex;align-items:center;gap:8px;margin:6px 0 10px}
 .ava{width:42px;height:42px;border-radius:50%;background:var(--card);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;flex:none;cursor:pointer}
@@ -86,6 +89,23 @@ canvas{width:100%;height:170px;min-height:80px;background:var(--card);border:1px
 .resultbox .right{font-weight:700}
 .resultbox .yes{color:var(--ok);font-weight:700;margin-left:auto}
 .resultbox .no-mark{color:var(--no);font-weight:700;margin-left:auto}
+.coinbar{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:6px 10px;font-size:15px;margin:6px 0}
+.coinbar b{color:var(--ac)}
+.coin{width:18px;height:18px;vertical-align:-3px;display:inline-block}
+.rowclick{cursor:pointer}
+.friendrow{display:flex;align-items:center;gap:8px;padding:6px 2px;border-bottom:1px dashed var(--bd)}
+.friendrow:last-child{border-bottom:none}
+.friendrow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.friendrow .ava{width:34px;height:34px;font-size:18px;cursor:default}
+.banner{background:var(--okb);border:1px solid var(--ok);border-radius:12px;padding:10px 12px;margin:8px 0}
+.banner b{color:var(--ok)}
+.banner .row{margin-top:6px}
+.idbox{display:flex;gap:6px;align-items:center;margin:6px 0}
+.idbox input{flex:1;font-family:ui-monospace,monospace;letter-spacing:1px}
+.lockrow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:6px 0}
+.lockrow .val{font-weight:700;color:var(--ac);font-family:ui-monospace,monospace;letter-spacing:1px}
+.shoprow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed var(--bd)}
+.shoprow:last-child{border-bottom:none}
 </style></head><body><div id="app"></div>
 
 <script type="module">
@@ -95,7 +115,11 @@ import {
   signOut, onAuthStateChanged, deleteUser,
   reauthenticateWithCredential, EmailAuthProvider
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import {
+  initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
+  doc, getDoc, setDoc, deleteDoc,
+  collection, getDocs
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAYrnp-br1AvbKqvcgThKss0VGMK0jbnhk",
@@ -108,16 +132,21 @@ const firebaseConfig = {
 };
 const fbApp = initializeApp(firebaseConfig);
 const fbAuth = getAuth(fbApp);
-const fbDb = getFirestore(fbApp);
+const fbDb = initializeFirestore(fbApp, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+});
 window.FB = {
   auth: fbAuth, db: fbDb,
-  doc, getDoc, setDoc, deleteDoc,
+  doc, getDoc, setDoc, deleteDoc, collection, getDocs,
   createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
   onAuthStateChanged, deleteUser,
   reauthenticateWithCredential, EmailAuthProvider
 };
 
 window.__startApp = function(){
+  const $=document.getElementById("app");
+  $.innerHTML=`<div class="authWrap"><h1>Тренажёр иероглифов 汉字</h1><p>Загрузка…</p></div>`;
+
   const M={a:"āáǎà",e:"ēéěè",i:"īíǐì",o:"ōóǒò",u:"ūúǔù",v:"ǖǘǚǜ"};
   const RV={};
   for(const b in M){[...M[b]].forEach((ch,k)=>{RV[ch]=b+(k+1)})}
@@ -136,7 +165,6 @@ window.__startApp = function(){
   function noTone(s){return s.replace(/[0-9]/g,"")}
   function normHz(s){return String(s).replace(/\s+/g,"")}
 
-  const $=document.getElementById("app");
   const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 
   let P={},X=[],HIDE={hz:false,cv:false},ZOOM=170,SEL=new Set(),CUSTOM=[];
@@ -146,41 +174,52 @@ window.__startApp = function(){
   let CURRENT_NICK="";
   let SHOW_AVA=false;
   let SAVE_TIMER=null;
+  let DATA_LOADED=false;
 
-  function sv(){
-    if(!CURRENT_USER)return;
-    if(SAVE_TIMER)clearTimeout(SAVE_TIMER);
-    SAVE_TIMER=setTimeout(async ()=>{
+  let COINS=0;
+  let REPEAT_COUNT=0;
+  let SHORT_ID="";
+  let FRIENDS=[];
+  let INCOMING=[];
+  let SELECT_MODE=false;
+  let RND_OPEN=false;
+
+  // лимит повторов на слово в день
+  const DAILY_WORD_REPEAT_LIMIT = 10;
+  let DAY_KEY = "";
+  let DAILY_WORD_REPEATS = {};
+
+  function todayKey(){
+    const d=new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+  function rollDayIfNeeded(){
+    const t=todayKey();
+    if(DAY_KEY!==t){ DAY_KEY=t; DAILY_WORD_REPEATS={}; }
+  }
+  function pluralKulebyaka(n){
+    const a=Math.abs(n)%100, b=a%10;
+    if(a>10&&a<20)return "кулебяк";
+    if(b===1)return "кулебяка";
+    if(b>=2&&b<=4)return "кулебяки";
+    return "кулебяк";
+  }
+
+  const ALPH="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  function genShortId(){let s="";for(let i=0;i<6;i++)s+=ALPH[Math.floor(Math.random()*ALPH.length)];return s}
+  async function allocateShortId(uid){
+    for(let k=0;k<10;k++){
+      const id=genShortId();
+      const ref=window.FB.doc(window.FB.db,"shortIds",id);
       try{
-        await window.FB.setDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid),{
-          avatar: CURRENT_AVATAR, nick: CURRENT_NICK,
-          data: { P, X, HIDE, ZOOM, SEL:[...SEL], CUSTOM, autosort: !!window.__autosort, updatedAt: Date.now() }
-        }, {merge:true});
-      }catch(e){console.warn("save error",e)}
-    },500);
+        const snap=await window.FB.getDoc(ref);
+        if(snap.exists())continue;
+        await window.FB.setDoc(ref,{uid});
+        return id;
+      }catch(e){}
+    }
+    throw new Error("Не удалось выделить ID");
   }
-  async function loadProgress(uid){
-    try{
-      const snap=await window.FB.getDoc(window.FB.doc(window.FB.db,"users",uid));
-      if(snap.exists()){
-        const obj=snap.data()||{};
-        CURRENT_AVATAR=obj.avatar||"";
-        CURRENT_NICK=obj.nick||"";
-        const d=obj.data||{};
-        P=d.P||{}; X=d.X||[];
-        HIDE=Object.assign({hz:false,cv:false},d.HIDE||{});
-        ZOOM=+d.ZOOM||170;
-        SEL=new Set(d.SEL||[]);
-        CUSTOM=d.CUSTOM||[];
-        window.__autosort=!!d.autosort;
-      }else{
-        P={};X=[];HIDE={hz:false,cv:false};ZOOM=170;SEL=new Set();CUSTOM=[];
-        window.__autosort=false;
-        await sv();
-      }
-    }catch(e){console.warn("load error",e)}
-  }
-
   const mk=t=>t.split("\n").filter(Boolean).map(l=>{const p=l.split("|");return{h:p[0],s:p[1].split(" "),ru:p[2],pos:p[3],l:+p[4]||0}});
   const T=["你好","你是哪国人","那是你的书吗","图书馆在哪儿","清华大学在哪儿","现在几点","明天你有课吗","你的电话号码是多少","多少钱一本","你家有几口人","北京的冬天比较冷","在干什么呢","我打算去商店买东西","你喜欢什么颜色的","明天是我朋友的生日","周末你干什么","做客（一）","做客（二）","早睡早起比较好啊","看病人","中国朋友太热情了","他感冒了","你学了多长时间汉语","明天见","你得多锻炼锻炼了","快考试了","爸爸妈妈让我回家","考得怎么样","你什么时候去旅行","我要参加联欢会"];
 
@@ -845,7 +884,7 @@ window.__startApp = function(){
 四|si4|четыре|число|0
 五|wu3|пять|число|0
 七|qi1|семь|число|0`);
-
+  // ============ блоки / слова ============
   function ensureAutosort(){
     if(window.__autosort)return;
     XB.forEach(w=>{if(!X.some(x=>x.h===w.h))X.push({...w,blk:""})});
@@ -901,10 +940,10 @@ window.__startApp = function(){
   function lw(n){return lwBase(n).slice().concat(lwExtra(n).slice())}
 
   const lr=w=>(P[w.h]&&P[w.h].s>=2);
-  const LV=[150,300,600,1200];
   let L=[],i=0,sc=0,wr=[],done=false,self=null;
   let HISTORY=[];
   let cv,cx,dr=false,cvReady=false;
+
   function selKeyBase(n){return "b"+n}
   function selKeyExtra(n){return "e"+n}
   function selKeyMy(blk){return "m:"+blk}
@@ -912,6 +951,83 @@ window.__startApp = function(){
   const AVAS=["🐼","🐯","🐸","🐵","🦊","🐨","🐷","🐙","🐧","🦄","🐢","🦁","🐮","🐰","🐹","🐺","🐳","🐝","🦋","🐬","🐲","🍀","🌸","⭐","🌙","☀️","🌈","🍎","🍓","🍕"];
   let pickedAva="🐼";
 
+  // ============ сохранение ============
+  function sv(){
+    if(!CURRENT_USER || !DATA_LOADED)return;
+    if(SAVE_TIMER)clearTimeout(SAVE_TIMER);
+    SAVE_TIMER=setTimeout(async ()=>{
+      try{
+        await window.FB.setDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid),{
+          avatar: CURRENT_AVATAR, nick: CURRENT_NICK, shortId: SHORT_ID,
+          coins: COINS, repeatCount: REPEAT_COUNT, friends: FRIENDS,
+          dayKey: DAY_KEY, dailyWordRepeats: DAILY_WORD_REPEATS,
+          data: { P, X, HIDE, ZOOM, SEL:[...SEL], CUSTOM, autosort: !!window.__autosort, updatedAt: Date.now() }
+        }, {merge:true});
+      }catch(e){console.warn("save error",e)}
+    },500);
+  }
+
+  async function loadProgress(uid){
+    try{
+      const snap=await window.FB.getDoc(window.FB.doc(window.FB.db,"users",uid));
+      if(snap.exists()){
+        const obj=snap.data()||{};
+        CURRENT_AVATAR=obj.avatar||"";
+        CURRENT_NICK=obj.nick||"";
+        SHORT_ID=obj.shortId||"";
+        COINS=+obj.coins||0;
+        REPEAT_COUNT=+obj.repeatCount||0;
+        FRIENDS=Array.isArray(obj.friends)?obj.friends.slice():[];
+        DAY_KEY=obj.dayKey||"";
+        DAILY_WORD_REPEATS=obj.dailyWordRepeats||{};
+        if(DAY_KEY!==todayKey()){ DAY_KEY=todayKey(); DAILY_WORD_REPEATS={}; }
+        const d=obj.data||{};
+        P=d.P||{}; X=d.X||[];
+        HIDE=Object.assign({hz:false,cv:false},d.HIDE||{});
+        ZOOM=+d.ZOOM||170;
+        SEL=new Set(d.SEL||[]);
+        CUSTOM=d.CUSTOM||[];
+        window.__autosort=!!d.autosort;
+
+        if(!SHORT_ID){
+          try{
+            const newId=await allocateShortId(uid);
+            SHORT_ID=newId;
+            await window.FB.setDoc(window.FB.doc(window.FB.db,"users",uid),{shortId:newId},{merge:true});
+          }catch(e){console.warn("shortId migrate",e)}
+        }
+
+        if(!obj.coinsMigrated){
+          const learnedCount=Object.keys(P).filter(h=>P[h] && P[h].s>=2).length;
+          let newCoins=COINS;
+          if(learnedCount>0 && COINS===0){ newCoins=learnedCount*10; COINS=newCoins; }
+          await window.FB.setDoc(window.FB.doc(window.FB.db,"users",uid),{
+            coins: newCoins, coinsMigrated: true
+          },{merge:true});
+        }
+
+        await loadIncoming(uid);
+      }else{
+        P={};X=[];HIDE={hz:false,cv:false};ZOOM=170;SEL=new Set();CUSTOM=[];
+        window.__autosort=false; COINS=0; REPEAT_COUNT=0; FRIENDS=[]; INCOMING=[];
+        DAY_KEY=todayKey(); DAILY_WORD_REPEATS={};
+        DATA_LOADED=true;
+        await sv();
+      }
+    }catch(e){console.warn("load error",e)}
+    DATA_LOADED=true;
+  }
+
+  async function loadIncoming(uid){
+    INCOMING=[];
+    try{
+      const col=window.FB.collection(window.FB.db,"users",uid,"incoming");
+      const qs=await window.FB.getDocs(col);
+      qs.forEach(doc=>INCOMING.push({id:doc.id,...doc.data()}));
+    }catch(e){console.warn("incoming",e)}
+  }
+
+  // ============ auth ============
   function authScreen(){
     pickedAva="🐼";
     $.innerHTML=`<div class="authWrap">
@@ -965,8 +1081,15 @@ window.__startApp = function(){
       const cred=await window.FB.createUserWithEmailAndPassword(window.FB.auth,email,pass);
       CURRENT_AVATAR=pickedAva;
       CURRENT_NICK="";
+      let shortId="";
+      try{ shortId=await allocateShortId(cred.user.uid); }
+      catch(e){ shortId="TMP"+Math.random().toString(36).slice(2,8).toUpperCase(); }
+      SHORT_ID=shortId; COINS=0; REPEAT_COUNT=0; FRIENDS=[]; INCOMING=[];
+      DAY_KEY=todayKey(); DAILY_WORD_REPEATS={};
       await window.FB.setDoc(window.FB.doc(window.FB.db,"users",cred.user.uid),{
         avatar: CURRENT_AVATAR, nick: CURRENT_NICK,
+        shortId: SHORT_ID, coins: 0, repeatCount: 0, friends: [],
+        coinsMigrated: true, dayKey: DAY_KEY, dailyWordRepeats: {},
         data: {P:{},X:[],HIDE:{hz:false,cv:false},ZOOM:170,SEL:[],CUSTOM:[],autosort:false,updatedAt:Date.now()}
       });
     }catch(e){err.textContent=ruErr(e.code||e.message);}
@@ -981,6 +1104,7 @@ window.__startApp = function(){
     return "Ошибка: "+code;
   }
 
+  // ============ аватар / ник ============
   function renderAvaP2(){
     const el=document.getElementById("avaP2");
     if(!el)return;
@@ -1025,6 +1149,10 @@ window.__startApp = function(){
     if(t.length<2||t.length>24){alert("Ник должен быть от 2 до 24 символов");return}
     CURRENT_NICK=t;await sv();window.__home();
   };
+  window.__copyId=()=>{
+    if(!SHORT_ID)return;
+    try{navigator.clipboard.writeText(SHORT_ID);alert("ID скопирован: "+SHORT_ID);}catch(e){alert(SHORT_ID);}
+  };
 
   window.__deleteAccount=async ()=>{
     if(!CURRENT_USER)return;
@@ -1037,6 +1165,7 @@ window.__startApp = function(){
       const cred = window.FB.EmailAuthProvider.credential(CURRENT_USER.email, pass);
       await window.FB.reauthenticateWithCredential(CURRENT_USER, cred);
       try{await window.FB.deleteDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid));}catch(e){console.warn("fs del",e);}
+      if(SHORT_ID){try{await window.FB.deleteDoc(window.FB.doc(window.FB.db,"shortIds",SHORT_ID));}catch(e){}}
       await window.FB.deleteUser(CURRENT_USER);
       try{await window.FB.signOut(window.FB.auth);}catch(e){}
       alert("Аккаунт удалён.");
@@ -1048,65 +1177,128 @@ window.__startApp = function(){
     }
   };
 
+  // ============ экономика ============
+  function awardForWord(w, wasLearned, correct){
+    if(!correct) return;
+    rollDayIfNeeded();
+    const nowLearned = lr(w);
+    if(!wasLearned && nowLearned){
+      COINS += 10;
+      return;
+    }
+    if(!wasLearned) return;
+
+    const cnt = DAILY_WORD_REPEATS[w.h]||0;
+    if(cnt >= DAILY_WORD_REPEAT_LIMIT) return;
+    DAILY_WORD_REPEATS[w.h] = cnt+1;
+
+    let earned=0;
+    REPEAT_COUNT++;
+    if(REPEAT_COUNT % 10 === 0) earned=10;
+    else if(REPEAT_COUNT % 5 === 0) earned=5;
+    COINS += earned;
+  }
+  // ============ home ============
   function home(){
     let all=[];
     for(let n=1;n<=20;n++)all=all.concat(lw(n));
     all=all.concat(X);
+    const totalAll=all0().length;
     const k=all.filter(lr).length;
+
+    const banner=INCOMING.length?INCOMING.map(it=>{
+      if(it.kind==="friend")
+        return `<div class="banner"><b>👋 ${escapeHtml(it.fromNick||"Друг")}</b> хочет добавить вас в друзья.
+          <div class="row">
+            <button class="b" style="margin:0" onclick="__acceptFriend('${it.id}','${it.fromId}','${escapeHtml(it.fromNick||"")}')">Принять</button>
+            <button class="b" style="margin:0" onclick="__declineIncoming('${it.id}')">Отклонить</button></div></div>`;
+      if(it.kind==="share")
+        return `<div class="banner"><b>📚 ${escapeHtml(it.fromNick||"Друг")}</b> поделился блоком «${escapeHtml(it.shareName||"без названия")}».
+          <div class="tiny">Вы можете редактировать и удалять его у себя без вреда для ${escapeHtml(it.fromNick||"друга")}.</div>
+          <div class="row">
+            <button class="b" style="margin:0" onclick="__acceptShare('${it.id}')">Принять</button>
+            <button class="b" style="margin:0" onclick="__declineIncoming('${it.id}')">Отклонить</button></div></div>`;
+      return "";
+    }).join(""):"";
+
     const rows=[];
     for(let n=1;n<=20;n++){
       const w=lwBase(n),d=w.filter(lr).length,t=T[n-1]||"";
+      const cb=SELECT_MODE
+        ? `<input type="checkbox" data-sel="b${n}" ${SEL.has(selKeyBase(n))?"checked":""} onchange="__toggleSel('b${n}',this.checked)">`
+        : "";
+      const play=SELECT_MODE ? "" :
+        `<button style="flex:none;border:none;background:transparent;color:var(--ac);font-weight:600;padding:4px 8px" onclick="event.stopPropagation();__goLesson(${n},false)">▶</button>`;
+      const clickAttr=SELECT_MODE?"":`onclick="__goLesson(${n},false)"`;
       if(w.length){
-        rows.push(`<div class="b ls">
-          <label class="chk" style="margin:0;color:var(--tx)">
-            <input type="checkbox" data-sel="b${n}" ${SEL.has(selKeyBase(n))?"checked":""} onchange="__toggleSel('b${n}',this.checked)">
-            <span class="ttl"><b>${n}.</b> ${t}</span>
-          </label>
-          <button style="flex:none;border:none;background:transparent;color:var(--ac);font-weight:600;padding:4px 8px" onclick="__go(lwBase(${n}))">▶</button>
-          <small>${d}/${w.length}</small></div>`);
+        rows.push(`<div class="b ls ${SELECT_MODE?"":"rowclick"}" ${clickAttr}>
+          <div class="chk" style="margin:0;color:var(--tx)">
+            ${cb}<span class="ttl" style="pointer-events:none"><b>${n}.</b> ${t}</span>
+          </div>
+          ${play}<small>${d}/${w.length}</small></div>`);
       }else{
         rows.push(`<div class="b ls dis"><span class="ttl"><b>${n}.</b> ${t}</span><small>слов пока нет</small></div>`);
       }
       const g=lwExtra(n);
       if(g.length){
         const d2=g.filter(lr).length;
-        rows.push(`<div class="b ls" style="margin-top:-4px">
-          <label class="chk" style="margin:0;color:var(--tx)">
-            <input type="checkbox" data-sel="e${n}" ${SEL.has(selKeyExtra(n))?"checked":""} onchange="__toggleSel('e${n}',this.checked)">
-            <span class="ttl"><i>Доп. слова к уроку ${n}</i></span>
-          </label>
-          <button style="flex:none;border:none;background:transparent;color:var(--ac);font-weight:600;padding:4px 8px" onclick="__go(lwExtra(${n}))">▶</button>
-          <small>${d2}/${g.length}</small></div>`);
+        const cb2=SELECT_MODE
+          ? `<input type="checkbox" data-sel="e${n}" ${SEL.has(selKeyExtra(n))?"checked":""} onchange="__toggleSel('e${n}',this.checked)">`
+          : "";
+        const play2=SELECT_MODE ? "" :
+          `<button style="flex:none;border:none;background:transparent;color:var(--ac);font-weight:600;padding:4px 8px" onclick="event.stopPropagation();__goLesson(${n},true)">▶</button>`;
+        const click2=SELECT_MODE?"":`onclick="__goLesson(${n},true)"`;
+        rows.push(`<div class="b ls ${SELECT_MODE?"":"rowclick"}" style="margin-top:-4px" ${click2}>
+          <div class="chk" style="margin:0;color:var(--tx)">
+            ${cb2}<span class="ttl" style="pointer-events:none"><i>Доп. слова к уроку ${n}</i></span>
+          </div>
+          ${play2}<small>${d2}/${g.length}</small></div>`);
       }
     }
+    const ls = rows.join("");
+
     const blkRows=blocks().map((b,idx)=>{
       const g=wordsInBlock("c:"+b.id);
       const d=g.filter(lr).length;
       const key="m:c:"+b.id;
-      const on=SEL.has(key)?"checked":"";
-      const up=idx>0?`<button onclick="__moveBlock('${b.id}',-1)" title="Выше">↑</button>`:`<button disabled style="opacity:.4">↑</button>`;
-      const dn=idx<CUSTOM.length-1?`<button onclick="__moveBlock('${b.id}',1)" title="Ниже">↓</button>`:`<button disabled style="opacity:.4">↓</button>`;
-      return `<div class="blkrow">
-        <label class="chk" style="margin:0;color:var(--tx);flex:1">
-          <input type="checkbox" data-sel="m:c:${b.id}" ${on} onchange="__toggleSel('m:c:${b.id}',this.checked)">
-          <span class="nm">📁 ${b.name||"Без названия"} <small>(${d}/${g.length})</small></span>
-        </label>
+      const cb=SELECT_MODE
+        ? `<input type="checkbox" data-sel="m:c:${b.id}" ${SEL.has(key)?"checked":""} onchange="__toggleSel('${key}',this.checked)">`
+        : "";
+      const up=idx>0?`<button onclick="event.stopPropagation();__moveBlock('${b.id}',-1)" title="Выше">↑</button>`:`<button disabled>↑</button>`;
+      const dn=idx<CUSTOM.length-1?`<button onclick="event.stopPropagation();__moveBlock('${b.id}',1)" title="Ниже">↓</button>`:`<button disabled>↓</button>`;
+      if(SELECT_MODE){
+        return `<div class="blkrow">
+          <div class="chk" style="margin:0;color:var(--tx);flex:1">${cb}
+            <span class="nm">📁 ${escapeHtml(b.name||"Без названия")} <small>(${d}/${g.length})</small></span>
+          </div>${up}${dn}</div>`;
+      }
+      return `<div class="blkrow rowclick" data-blk="${b.id}" onclick="__goBlock('c:${b.id}')">
+        <span class="nm" style="flex:1;pointer-events:none">📁 ${escapeHtml(b.name||"Без названия")} <small>(${d}/${g.length})</small></span>
         ${up}${dn}
-        <button onclick="__goBlock('c:${b.id}')" title="Тренировать">▶</button>
-        <button onclick="__delBlock('${b.id}')" title="Удалить блок">✕</button></div>`;
+        <button onclick="event.stopPropagation();__shareBlock('${b.id}')" title="Поделиться">📤</button>
+        <button onclick="event.stopPropagation();__delBlock('${b.id}')" title="Удалить">✕</button></div>`;
     }).join("");
-    const ls=rows.join("");
+
     const unsorted=myUnsorted();
-    const unsortedBlock=`<div class="b ls">
-      <label class="chk" style="margin:0;color:var(--tx)">
-        <input type="checkbox" data-sel="m:" ${SEL.has(selKeyMy(""))?"checked":""} onchange="__toggleSel('m:',this.checked)">
-        <span class="ttl">Дополнительные слова (не сортировано)</span>
-      </label>
-      <button style="flex:none;border:none;background:transparent;color:var(--ac);font-weight:600;padding:4px 8px" onclick="__goBlock('')">▶</button>
-      <small>${unsorted.filter(lr).length}/${unsorted.length}</small></div>`;
+    const cbMy=SELECT_MODE
+      ? `<input type="checkbox" data-sel="m:" ${SEL.has(selKeyMy(""))?"checked":""} onchange="__toggleSel('m:',this.checked)">`
+      : "";
+    const playMy=SELECT_MODE ? "" :
+      `<button style="flex:none;border:none;background:transparent;color:var(--ac);font-weight:600;padding:4px 8px" onclick="event.stopPropagation();__goBlock('')">▶</button>`;
+    const clickMy=SELECT_MODE?"":`onclick="__goBlock('')"`;
+    const unsortedBlock=`<div class="b ls ${SELECT_MODE?"":"rowclick"}" ${clickMy}>
+      <div class="chk" style="margin:0;color:var(--tx)">${cbMy}
+        <span class="ttl">Дополнительные слова (не сортировано)</span></div>
+      ${playMy}<small>${unsorted.filter(lr).length}/${unsorted.length}</small></div>`;
+
     const avaHtml = CURRENT_AVATAR.startsWith("data:")?`<img src="${CURRENT_AVATAR}" alt="">`:(CURRENT_AVATAR||"👤");
     const displayName = CURRENT_NICK || (CURRENT_USER?CURRENT_USER.email:"");
     const emailLine = CURRENT_NICK ? (CURRENT_USER?CURRENT_USER.email:"") : "";
+
+    const selCount = SELECT_MODE ? selectedWords().length : 0;
+    const rndPool = selCount > 0 ? selCount : totalAll;
+    const rndLabel = selCount > 0 ? `из выбранных: ${selCount}` : `в базе: ${totalAll}`;
+
     $.innerHTML=`<div class="topbar">
         <div class="ava" onclick="__openAvatarPicker()" title="Сменить аватар">${avaHtml}</div>
         <div class="info">
@@ -1117,6 +1309,9 @@ window.__startApp = function(){
         <button class="b" style="width:auto;margin:0;padding:8px 12px" onclick="__logout()">Выйти</button>
         <button class="delbtn" onclick="__deleteAccount()" title="Удалить аккаунт">✕</button>
       </div>
+
+      <div class="coinbar"><img src="coin.png" class="coin" alt="🪙" onerror="this.replaceWith('🪙')"> <b>${COINS}</b> ${pluralKulebyaka(COINS)}</div>
+
       ${SHOW_AVA?`<div class="hs" id="avaPanel">
         <b>Сменить аватар</b>
         <div class="avaP" id="avaP2"></div>
@@ -1125,24 +1320,56 @@ window.__startApp = function(){
             <input type="file" id="avaFile" accept="image/*" style="display:none" onchange="__onAvaFile(event)"></label>
           <button class="b" style="margin:0;flex:1" onclick="__closeAva()">Закрыть</button>
         </div></div>`:""}
+
+      ${banner}
+
       <h1>Тренажёр иероглифов 汉字</h1>
-      <button class="b p" onclick="__numHome()">🔢 Тренажёр чисел</button>
-      <label><input type="checkbox" id="mx" ${mixed?"checked":""} onchange="__setMixed(this.checked)"> Перемешать слова</label>
+
       <div class="row" style="margin:6px 0">
-        <button class="b p" style="margin:0" onclick="__goSelected()">Выбранные слова</button>
-        <button class="b" style="margin:0" onclick="__markAll()">Отметить все</button></div>
-      <div class="tiny" id="selInfo"></div>
+        <button class="b p" style="margin:0;flex:1" onclick="__numHome()">🔢 Числа</button>
+        <button class="b" style="margin:0;flex:1" onclick="__shop()">🛒 Магазин</button>
+        <button class="b" style="margin:0;flex:1" onclick="__friends()">👥 Друзья</button>
+      </div>
+
+      <label><input type="checkbox" id="mx" ${mixed?"checked":""} onchange="__setMixed(this.checked)"> Перемешать слова</label>
+
+      <div class="hs">
+        <div class="lockrow" style="cursor:pointer" onclick="__toggleRnd()">
+          <b>🎲 Случайные слова</b>
+          <span>${RND_OPEN?"▲":"▼"}</span>
+        </div>
+        ${RND_OPEN?`
+          <div class="tiny" id="rndInfo">${rndLabel} слов</div>
+          <input type="number" id="rndN" min="1" max="${rndPool}" placeholder="Сколько (1–${rndPool})">
+          <button class="b p" id="rndBtn" onclick="__randomGo()">Тренировать случайные${selCount>0?" из выбранных":""}</button>
+        `:""}
+      </div>
+
+      <div class="row" style="margin:6px 0">
+        ${SELECT_MODE
+          ? `<button class="b" style="margin:0" onclick="__cancelSelect()">✕ Отмена</button>`
+          : `<button class="b" style="margin:0" onclick="__toggleSelectMode()">☑ Выбрать несколько</button>`}
+      </div>
+
+      ${SELECT_MODE?`<div class="row" style="margin:6px 0">
+        <button class="b p" style="margin:0;flex:1" onclick="__goSelected()">Тренировать выбранные</button>
+        <button class="b" style="margin:0;flex:1" onclick="__markAll()">Отметить все</button></div>
+        <div class="tiny" id="selInfo"></div>`:""}
+
       ${ls}
+
       <div class="hs"><b>Мои блоки</b>${blkRows||`<div class="tiny">Блоков пока нет.</div>`}
         <input type="text" id="bn" placeholder="Название нового блока">
         <button class="b" onclick="__addBlock()">Создать блок</button></div>
+
       ${unsortedBlock}
+
       <div class="hs"><b>Мои слова</b>
-        <div class="tiny" style="margin-bottom:6px">Сначала нерассортированные, потом сортированные (по возрастанию).</div>
+        <div class="tiny" style="margin-bottom:6px">Только неразложенные (вне блоков и уроков).</div>
         <input type="text" id="xh" placeholder="Иероглифы"><input type="text" id="xp" placeholder="Пиньинь с цифрами: xi2 guan4" autocapitalize="off"><input type="text" id="xr" placeholder="Перевод"><button class="b" onclick="__addX()">Добавить слово</button><small id="xm"></small>
         <div class="wlist" id="wlist"></div></div>`;
     renderWords();
-    updateSelInfo();
+    if(SELECT_MODE)updateSelInfo();
     if(SHOW_AVA) renderAvaP2();
   }
   function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
@@ -1156,7 +1383,8 @@ window.__startApp = function(){
   function renderWords(){
     const el=document.getElementById("wlist");
     if(!el)return;
-    if(!X.length){el.innerHTML=`<div class="tiny">Слов пока нет.</div>`;return}
+    const unsorted = X.map((w,idx)=>({w,idx})).filter(({w})=>(w.blk||"")==="");
+    if(!unsorted.length){el.innerHTML=`<div class="tiny">Нет неразложенных слов.</div>`;return}
     const blocksOpts=(cur)=>{
       let html=`<option value="" ${!cur?"selected":""}>Не сортировано</option>`;
       for(const b of blocks()){html+=`<option value="c:${b.id}" ${cur==="c:"+b.id?"selected":""}>📁 ${b.name||"Без названия"}</option>`}
@@ -1164,24 +1392,17 @@ window.__startApp = function(){
       for(const n of [18,19,20]){html+=`<option value="X:${n}" ${cur==="X:"+n?"selected":""}>→ Доп. к уроку ${n}</option>`}
       return html;
     };
-    const withIdx=X.map((w,idx)=>({w,idx}));
-    const groups=new Map();
-    for(const it of withIdx){const blk=it.w.blk||"";if(!groups.has(blk))groups.set(blk,[]);groups.get(blk).push(it);}
-    const keys=[...groups.keys()].sort((a,b)=>{if(a==="")return -1;if(b==="")return 1;return labelForBlk(a).localeCompare(labelForBlk(b),"ru")});
-    let html="";
-    for(const key of keys){
-      const arr=groups.get(key).slice().reverse();
-      html+=`<div class="grouphdr">${labelForBlk(key)} (${arr.length})</div>`;
-      html+=arr.map(({w,idx})=>`<div class="wrow">
-        <span class="big">${w.h}</span>
-        <span class="tt"><small>${w.s.map(mark).join(" ")}</small> — ${w.ru}</span>
-        <select onchange="__moveWord(${idx},this.value)">${blocksOpts(w.blk||"")}</select>
-        <button onclick="__delWord(${idx})">✕</button></div>`).join("");
-    }
-    el.innerHTML=html;
+    el.innerHTML = unsorted.slice().reverse().map(({w,idx})=>`<div class="wrow">
+      <span class="big">${w.h}</span>
+      <span class="tt"><small>${w.s.map(mark).join(" ")}</small> — ${w.ru}</span>
+      <select onchange="__moveWord(${idx},this.value)">${blocksOpts(w.blk||"")}</select>
+      <button onclick="__delWord(${idx})">✕</button></div>`).join("");
   }
 
   window.__setMixed=v=>{mixed=v};
+  window.__toggleRnd=()=>{RND_OPEN=!RND_OPEN;window.__home()};
+  window.__toggleSelectMode=()=>{SELECT_MODE=!SELECT_MODE;window.__home()};
+  window.__cancelSelect=()=>{SELECT_MODE=false;window.__home()};
   window.__moveWord=(idx,blk)=>{if(!X[idx])return;X[idx].blk=blk;sv();window.__home()};
   window.__delWord=idx=>{if(!X[idx])return;X.splice(idx,1);sv();window.__home()};
   window.__addBlock=()=>{const n=document.getElementById("bn").value.trim();if(!n)return;const id=Date.now().toString(36)+Math.random().toString(36).slice(2,5);CUSTOM.push({id,name:n});sv();window.__home()};
@@ -1210,12 +1431,35 @@ window.__startApp = function(){
     if(!list.length){alert("В этом блоке пока нет слов.");return}
     window.__go(list);
   };
-  window.__toggleSel=(key,on)=>{if(on)SEL.add(key);else SEL.delete(key);sv();updateSelInfo()};
+  window.__goLesson=(n,isExtra)=>{
+    const list = isExtra ? lwExtra(n) : lwBase(n);
+    if(!list.length){alert("В этом уроке пока нет слов.");return}
+    window.__go(list);
+  };
+  window.__toggleSel=(key,on)=>{
+    if(on)SEL.add(key);else SEL.delete(key);
+    sv();
+    updateSelInfo();
+    updateRndInfo();
+  };
+  function updateRndInfo(){
+    if(!RND_OPEN)return;
+    const selCount = selectedWords().length;
+    const totalAll = all0().length;
+    const rndPool = selCount > 0 ? selCount : totalAll;
+    const rndLabel = selCount > 0 ? `из выбранных: ${selCount}` : `в базе: ${totalAll}`;
+    const info = document.getElementById("rndInfo");
+    if(info) info.textContent = rndLabel + " слов";
+    const inp = document.getElementById("rndN");
+    if(inp){ inp.max = rndPool; inp.placeholder = `Сколько (1–${rndPool})`; }
+    const btn = document.getElementById("rndBtn");
+    if(btn) btn.textContent = "Тренировать случайные" + (selCount > 0 ? " из выбранных" : "");
+  }
   window.__markAll=()=>{
     const all=document.querySelectorAll("input[data-sel]");
     const anyUn=Array.from(all).some(c=>!c.checked);
     all.forEach(c=>{if(c.disabled)return;c.checked=anyUn;const k=c.dataset.sel;if(anyUn)SEL.add(k);else SEL.delete(k)});
-    sv();updateSelInfo();
+    sv();updateSelInfo();updateRndInfo();
   };
   window.__goSelected=()=>{
     const w=selectedWords();
@@ -1223,6 +1467,18 @@ window.__startApp = function(){
     window.__go(w);
   };
   window.__logout=async()=>{try{await window.FB.signOut(window.FB.auth)}catch(e){}};
+  window.__randomGo=()=>{
+    let pool = all0();
+    if(SELECT_MODE){
+      const sel = selectedWords();
+      if(sel.length > 0) pool = sel;
+    }
+    const nEl=document.getElementById("rndN");
+    const n=Math.max(1,Math.min(pool.length,parseInt(nEl.value)||0));
+    if(!nEl.value||n<1){alert("Введите число от 1 до "+pool.length);return}
+    const picked=sh(pool.slice()).slice(0,n);
+    window.__go(picked);
+  };
 
   function selectedWords(){
     let list=[];
@@ -1251,22 +1507,213 @@ window.__startApp = function(){
     return out;
   }
 
+  // ============ магазин ============
+  window.__shop=()=>{
+    $.innerHTML=`<h1>🛒 Магазин</h1>
+      <p>Баланс: <img src="coin.png" class="coin" alt="🪙" onerror="this.replaceWith('🪙')"> ${COINS} ${pluralKulebyaka(COINS)}</p>
+      <div class="hs">
+        <div class="shoprow"><span style="flex:1">Товары появятся позже.</span><span class="tiny">—</span></div>
+      </div>
+      <button class="b" onclick="__home()">Назад</button>`;
+  };
+
+  // ============ друзья ============
+  window.__friends=async ()=>{
+    let friendCards="";
+    if(FRIENDS.length){
+      for(const fid of FRIENDS){
+        let u={};
+        try{const s=await window.FB.getDoc(window.FB.doc(window.FB.db,"shortIds",fid));if(s.exists()){const uid=s.data().uid;const us=await window.FB.getDoc(window.FB.doc(window.FB.db,"users",uid));if(us.exists())u=us.data();}}
+        catch(e){}
+        const av=u.avatar&&u.avatar.startsWith("data:")?`<img src="${u.avatar}" alt="">`:(u.avatar||"👤");
+        friendCards+=`<div class="friendrow">
+          <div class="ava">${av}</div>
+          <div class="nm"><b>${escapeHtml(u.nick||fid)}</b><br><small>${fid}</small></div>
+          <button onclick="__removeFriend('${fid}')">Удалить</button>
+        </div>`;
+      }
+    }else friendCards=`<div class="tiny">Пока никого.</div>`;
+
+    $.innerHTML=`<h1>👥 Друзья</h1>
+      <div class="idbox"><span class="tiny">Мой ID:</span>
+        <input type="text" readonly value="${escapeHtml(SHORT_ID)}" onclick="this.select()">
+        <button class="mini" onclick="__copyId()">📋</button></div>
+
+      <div class="hs"><b>Найти по ID</b>
+        <div class="row" style="margin-top:6px">
+          <input type="text" id="findId" placeholder="A7K2P9" autocapitalize="characters" style="text-transform:uppercase;font-family:ui-monospace,monospace;letter-spacing:1px">
+          <button class="b p" style="margin:0;width:auto" onclick="__findFriend()">Найти</button>
+        </div>
+        <div id="findRes"></div>
+      </div>
+
+      <div class="hs"><b>Мои друзья (${FRIENDS.length})</b>
+        ${friendCards}
+      </div>
+
+      <button class="b" onclick="__home()">Назад</button>`;
+  };
+
+  window.__findFriend=async ()=>{
+    const id=(document.getElementById("findId").value||"").trim().toUpperCase();
+    const el=document.getElementById("findRes");
+    el.innerHTML="";
+    if(!id){el.innerHTML=`<div class="tiny">Введите ID.</div>`;return}
+    if(id===SHORT_ID){el.innerHTML=`<div class="tiny">Это ваш ID 🙂</div>`;return}
+    if(FRIENDS.includes(id)){el.innerHTML=`<div class="tiny">Уже в друзьях.</div>`;return}
+    try{
+      const s=await window.FB.getDoc(window.FB.doc(window.FB.db,"shortIds",id));
+      if(!s.exists()){el.innerHTML=`<div class="tiny">Пользователь с таким ID не найден.</div>`;return}
+      const uid=s.data().uid;
+      const us=await window.FB.getDoc(window.FB.doc(window.FB.db,"users",uid));
+      if(!us.exists()){el.innerHTML=`<div class="tiny">Профиль не найден.</div>`;return}
+      const u=us.data();
+      const av=u.avatar&&u.avatar.startsWith("data:")?`<img src="${u.avatar}" alt="">`:(u.avatar||"👤");
+      el.innerHTML=`<div class="friendrow">
+        <div class="ava">${av}</div>
+        <div class="nm"><b>${escapeHtml(u.nick||id)}</b><br><small>${id}</small></div>
+        <button onclick="__sendFriendRequest('${id}','${uid}')">Добавить</button>
+      </div>`;
+    }catch(e){el.innerHTML=`<div class="tiny">Ошибка: ${escapeHtml(e.message||String(e))}</div>`}
+  };
+
+  window.__sendFriendRequest=async (toId,toUid)=>{
+    if(!CURRENT_USER)return;
+    try{
+      const reqId=Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+      await window.FB.setDoc(window.FB.doc(window.FB.db,"users",toUid,"incoming",reqId),{
+        kind:"friend", fromId: SHORT_ID, fromUid: CURRENT_USER.uid,
+        fromNick: CURRENT_NICK||"друг", ts: Date.now()
+      });
+      await window.FB.setDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid,"outgoing",reqId),{
+        kind:"friend", toId, toUid, ts: Date.now()
+      });
+      alert("Заявка отправлена.");
+    }catch(e){alert("Не удалось отправить: "+(e.message||e))}
+  };
+
+  window.__acceptFriend=async (incId,fromId,fromNick)=>{
+    if(!CURRENT_USER)return;
+    try{
+      if(!FRIENDS.includes(fromId)) FRIENDS.push(fromId);
+      // пишем сразу в Firestore, не через дебаунс sv()
+      await window.FB.setDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid),{friends: FRIENDS},{merge:true});
+      await window.FB.deleteDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid,"incoming",incId));
+      INCOMING=INCOMING.filter(x=>x.id!==incId);
+      try{
+        const s=await window.FB.getDoc(window.FB.doc(window.FB.db,"shortIds",fromId));
+        if(s.exists()){
+          const toUid=s.data().uid;
+          const us=await window.FB.getDoc(window.FB.doc(window.FB.db,"users",toUid));
+          if(us.exists()){
+            const cur=us.data().friends||[];
+            if(!cur.includes(SHORT_ID)){
+              await window.FB.setDoc(window.FB.doc(window.FB.db,"users",toUid),{friends:[...cur,SHORT_ID]},{merge:true});
+            }
+          }
+        }
+      }catch(e){console.warn("mirror",e)}
+      window.__home();
+    }catch(e){alert("Ошибка: "+(e.message||e))}
+  };
+
+  window.__removeFriend=async fid=>{
+    if(!confirm("Удалить из друзей?"))return;
+    FRIENDS=FRIENDS.filter(x=>x!==fid);
+    try{
+      await window.FB.setDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid),{friends: FRIENDS},{merge:true});
+      const s=await window.FB.getDoc(window.FB.doc(window.FB.db,"shortIds",fid));
+      if(s.exists()){
+        const toUid=s.data().uid;
+        const us=await window.FB.getDoc(window.FB.doc(window.FB.db,"users",toUid));
+        if(us.exists()){
+          const cur=(us.data().friends||[]).filter(x=>x!==SHORT_ID);
+          await window.FB.setDoc(window.FB.doc(window.FB.db,"users",toUid),{friends:cur},{merge:true});
+        }
+      }
+    }catch(e){console.warn("remove mirror",e)}
+    window.__friends();
+  };
+
+  window.__declineIncoming=async incId=>{
+    if(!CURRENT_USER)return;
+    try{
+      await window.FB.deleteDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid,"incoming",incId));
+      INCOMING=INCOMING.filter(x=>x.id!==incId);
+      window.__home();
+    }catch(e){alert("Ошибка: "+(e.message||e))}
+  };
+
+  // ============ шаринг блоков ============
+  window.__shareBlock=async blockId=>{
+    if(!CURRENT_USER)return;
+    if(!FRIENDS.length){alert("Сначала добавьте друзей.");return}
+    const b=CUSTOM.find(x=>x.id===blockId);
+    if(!b){alert("Блок не найден.");return}
+    let opts=FRIENDS.map(id=>id).join(", ");
+    const fid=prompt("Кому отправить блок «"+(b.name||"")+"»?\nДрузья: "+opts+"\nВведите ID друга:",FRIENDS[0]||"");
+    if(!fid)return;
+    const target=fid.trim().toUpperCase();
+    if(!FRIENDS.includes(target)){alert("Этот ID не в друзьях.");return}
+    try{
+      const words=wordsInBlock("c:"+blockId);
+      if(!words.length){alert("Блок пуст.");return}
+      const shareId=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+      await window.FB.setDoc(window.FB.doc(window.FB.db,"sharedBlocks",shareId),{
+        ownerUid: CURRENT_USER.uid, ownerId: SHORT_ID, ownerNick: CURRENT_NICK||"друг",
+        name: b.name, words, ts: Date.now()
+      });
+      const s=await window.FB.getDoc(window.FB.doc(window.FB.db,"shortIds",target));
+      if(!s.exists()){alert("Друг не найден.");return}
+      const toUid=s.data().uid;
+      const incId=Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+      await window.FB.setDoc(window.FB.doc(window.FB.db,"users",toUid,"incoming",incId),{
+        kind:"share", shareId, shareName: b.name,
+        fromId: SHORT_ID, fromNick: CURRENT_NICK||"друг", ts: Date.now()
+      });
+      alert("Блок отправлен.");
+    }catch(e){alert("Не удалось: "+(e.message||e))}
+  };
+
+  window.__acceptShare=async incId=>{
+    if(!CURRENT_USER)return;
+    const inc=INCOMING.find(x=>x.id===incId);
+    if(!inc||!inc.shareId)return;
+    try{
+      const s=await window.FB.getDoc(window.FB.doc(window.FB.db,"sharedBlocks",inc.shareId));
+      if(!s.exists()){alert("Блок не найден.");return}
+      const d=s.data();
+      const newId=Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+      CUSTOM.push({id:newId,name:d.name||"Из чата"});
+      const existing=new Set(X.map(w=>w.h));
+      (d.words||[]).forEach(w=>{
+        if(!existing.has(w.h)) X.push({...w, blk:"c:"+newId});
+      });
+      sv();
+      await window.FB.deleteDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid,"incoming",incId));
+      INCOMING=INCOMING.filter(x=>x.id!==incId);
+      window.__home();
+    }catch(e){alert("Не удалось: "+(e.message||e))}
+  };
+  // ============ тренировка ============
   window.__go=list=>{const c=document.getElementById("mx");if(c)mixed=c.checked;L=mixed?sh(list):list.slice();i=0;sc=0;wr=[];HISTORY=[];window.__show()};
-  
+
   function show(){
     const w=L[i];done=false;self=null;
     HISTORY[i]=HISTORY[i]||{hzRaw:"",pyRaw:"",hzOK:null,pyOK:null,pyNoTone:false,ok:null,done:false,self:null};
     const H=HISTORY[i];
-    const hzHidden=!!HIDE.hz, cvHidden=!!HIDE.cv;
+    const cvHidden=!!HIDE.cv;
     const navDisL = i<=0 ? "disabled" : "";
     const navDisR = i>=L.length-1 ? "disabled" : "";
 
     $.innerHTML=`<div class="m"><span>${i+1} / ${L.length}</span><span>верно: ${sc}</span></div>
+    <div class="m"><span><img src="coin.png" class="coin" alt="🪙" onerror="this.replaceWith('🪙')"> ${COINS} ${pluralKulebyaka(COINS)}</span></div>
     <div class="bar"><i style="width:${i/L.length*100}%"></i></div>
     <div class="q">${w.ru}</div>
     <div class="m"><span>${w.pos||"выражение"}</span><span>слогов: ${w.s.length}</span></div>
 
     <div class="navrow">
+      <button onclick="__toHome()" title="На главную">🏠</button>
       <button ${navDisL} onclick="__back()">← Назад</button>
       <button ${navDisR} onclick="__forward()">Вперёд →</button>
     </div>
@@ -1287,15 +1734,20 @@ window.__startApp = function(){
 
     paintHzSlot();
     paintPySlot();
-
     paintActions();
     if(!cvHidden)initCv();else{cv=null;cvReady=false;cx=null}
     if(!cvHidden)initResize();
-
     if(H.done) renderResult();
+    if(H.done) lockInputs();
   }
   window.__show=show;
   window.__home=home;
+  window.__toHome=()=>{window.__home()};
+
+  function lockInputs(){
+    const py=document.getElementById("py");
+    if(py)py.disabled=true;
+  }
 
   window.__hideBox=(k,on)=>{HIDE[k]=on;sv();show()};
 
@@ -1304,12 +1756,9 @@ window.__startApp = function(){
     if(!slot)return;
     const H=HISTORY[i]||{};
     if(!H.done){
-      slot.innerHTML=`<div class="inpwrap">
-        <input type="text" id="hz" class="hz" placeholder="Иероглифы" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-        <button class="mini" title="Скрыть поле иероглифов" onclick="__hideBox('hz',true)">👁</button>
+      slot.innerHTML=`<div class="resultbox" style="flex:1">
+        <span class="tiny">Оцените, знаете ли вы иероглиф — кнопки ниже.</span>
       </div>`;
-      const hzEl=document.getElementById("hz");
-      if(hzEl)hzEl.value=H.hzRaw||"";
     }else{
       slot.innerHTML=renderHzResult();
     }
@@ -1321,7 +1770,7 @@ window.__startApp = function(){
     const H=HISTORY[i]||{};
     if(!H.done){
       slot.innerHTML=`<div class="inpwrap" style="margin-top:6px">
-        <input type="text" id="py" placeholder="Пиньинь: ni3 hao3 / nǐ hǎo / ni hao" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <input type="text" id="py" placeholder="Пиньинь: ni3 hao3 / nǐ hǎo" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
       </div>`;
       const pyEl=document.getElementById("py");
       if(pyEl)pyEl.value=H.pyRaw||"";
@@ -1335,12 +1784,13 @@ window.__startApp = function(){
     if(!a)return;
     const H=HISTORY[i]||{};
     if(!H.done){
-      a.innerHTML=`<button class="b p" style="margin:0" onclick="__check()">Проверить</button>`;
+      a.innerHTML=`<button class="b" style="margin:0" onclick="__selfAns(false)">Неверно</button>
+        <button class="b p" style="margin:0" onclick="__selfAns(true)">Верно</button>`;
     }else{
       a.innerHTML=`<button class="b p" style="margin:0" onclick="__nx()">${i+1<L.length?"Дальше":"Результат"}</button>`;
     }
   }
-  
+
   function initCv(){
     cv=document.getElementById("cv");
     if(!cv){cvReady=false;return}
@@ -1372,72 +1822,78 @@ window.__startApp = function(){
     };
   }
 
-  window.__check=()=>{
+  function __checkPyOnly(){
     const w=L[i];
-    const hzEl=document.getElementById("hz"),pyEl=document.getElementById("py");
-    const hzRaw=hzEl?hzEl.value:"";const pyRaw=pyEl?pyEl.value:"";
-    let hzOK=null;
-    if(hzRaw.trim())hzOK=normHz(hzRaw)===normHz(w.h);
-    let pyOK=null,pyNoTone=false;
+    const H=HISTORY[i]||{};
+    if(H.done) return null;
+    const pyEl=document.getElementById("py");
+    const pyRaw=pyEl?pyEl.value:"";
+    let pyOK=null, pyNoTone=false;
     if(pyRaw.trim()){
-      const target=norm(w.s.join(" "));const got=norm(pyRaw);
-      if(got===target)pyOK=true;
-      else if(stripZero(got)===stripZero(target))pyOK=true;
-      else if(noTone(got)===noTone(target)){pyOK=true;pyNoTone=true}
+      const target=norm(w.s.join(" "));
+      const got=norm(pyRaw);
+      const gotHasTone=/[0-4]/.test(pyRaw) || /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(pyRaw);
+      const targetHasTone=/[0-4]/.test(target);
+      if(got===target) pyOK=true;
+      else if(gotHasTone && stripZero(got)===stripZero(target)) pyOK=true;
+      else if(targetHasTone && !gotHasTone) pyOK=false;
       else pyOK=false;
     }
-    let ok;
-    if(hzOK===null&&pyOK===null)ok=null;
-    else ok=(hzOK!==false)&&(pyOK!==false);
-    HISTORY[i]={hzRaw,pyRaw,hzOK,pyOK,pyNoTone,ok,done:true,self:null};
-    done=true;self=null;
-    renderResult();
-    paintActions();
+    H.pyRaw=pyRaw; H.pyOK=pyOK; H.pyNoTone=pyNoTone;
+    HISTORY[i]=H;
+    return pyOK;
+  }
+
+  window.__check=()=>{ /* не используется — проверка через self */ };
+
+  window.__selfAns=v=>{
+    const w=L[i]; const H=HISTORY[i]||{};
+    if(H.done) return;
+
+    __checkPyOnly();
+    const H2=HISTORY[i]||{};
+    const pyOK = H2.pyOK;
+    const pyRaw = H2.pyRaw || "";
+    const pyNoTone = H2.pyNoTone || false;
+
+    const selfOK=(v===true);
+    let finalOK;
+    if(pyRaw.trim()===""){
+      finalOK = false;
+    }else{
+      finalOK = selfOK && (pyOK !== false);
+    }
+
+    const wasLearned=lr(w);
+    const q=P[w.h]||{s:0};
+    q.s = finalOK ? Math.min(2,(q.s||0)+1) : 0;
+    P[w.h]=q;
+
+    if(finalOK) sc++; else wr.push(w);
+    awardForWord(w, wasLearned, finalOK);
+
+    H.self=v;H.ok=finalOK;H.done=true;H.hzRaw="";H.hzOK="self";H.pyOK=pyOK;H.pyRaw=pyRaw;H.pyNoTone=pyNoTone;
+    HISTORY[i]=H;
+    sv();
+    renderResult(); paintActions(); lockInputs();
   };
+
+  window.__nx=()=>{
+    const w=L[i]; const H=HISTORY[i];
+    if(!H||!H.done) return;
+    i++;
+    if(i<L.length) window.__show(); else end();
+  };
+  window.__back=()=>{if(i<=0)return;i--;window.__show()};
+  window.__forward=()=>{if(i>=L.length-1)return;i++;window.__show()};
 
   function renderHzResult(){
     const w=L[i];
     const H=HISTORY[i]||{};
-    const hzRaw=H.hzRaw||"";
-    const hzOK=H.hzOK;
-    const drawn=cv&&cvReady&&!HIDE.cv;
-    const H_self=H.self;
-
-    if(drawn && hzOK===null){
-      const boxClass = (H_self===null||H_self===undefined)?"":(H_self?"ok":"no");
-      const btnYes = H_self===true ? "p" : "";
-      const btnNo  = H_self===false ? "no-active" : "";
-      const dis = (H_self===null||H_self===undefined)?"":"disabled";
-      return `<div class="resultbox ${boxClass}" style="border-color:var(--bd);align-items:center">
-        <span class="big">${w.h}</span>
-        <span style="margin-left:auto;display:flex;gap:6px">
-          <button class="b ${btnNo}" style="margin:0;width:auto;padding:6px 10px;${btnNo?'background:var(--no);color:#fff;border-color:var(--no)':''}" ${dis} onclick="__selfAns(false)">Нет</button>
-          <button class="b ${btnYes}" style="margin:0;width:auto;padding:6px 10px;${btnYes?'background:var(--ac);color:#fff;border-color:var(--ac)':''}" ${dis} onclick="__selfAns(true)">Верно</button>
-        </span>
-      </div>`;
-    }
-
-    if(hzOK!==null){
-      if(hzOK===true){
-        return `<div class="resultbox ok">
-          <span class="big">${normHz(hzRaw)}</span><span class="yes">✓</span>
-        </div>`;
-      }else{
-        return `<div class="resultbox no">
-          <span class="big ans">${normHz(hzRaw)||"—"}</span>
-          <span class="arrow">→</span>
-          <span class="big right">${w.h}</span>
-        </div>`;
-      }
-    }
-
-    if(!drawn){
-      return `<div class="resultbox">
-        <span class="big right">${w.h}</span>
-      </div>`;
-    }
-
-    return `<div class="resultbox"><span class="big">${w.h}</span></div>`;
+    return `<div class="resultbox ${H.self===true?"ok":H.self===false?"no":""}">
+      <span class="big">${w.h}</span>
+      <span class="yes" style="margin-left:auto">${H.self===true?"✓":H.self===false?"✗":""}</span>
+    </div>`;
   }
 
   function renderPyResult(){
@@ -1462,13 +1918,11 @@ window.__startApp = function(){
         </div>`;
       }
     }
-
     if(pyRaw.trim()===""){
       return `<div class="resultbox" style="margin-top:6px">
         <span class="big right">${pyRight}</span>
       </div>`;
     }
-
     return `<div class="resultbox" style="margin-top:6px"><span class="big">${pyRight}</span></div>`;
   }
 
@@ -1487,53 +1941,10 @@ window.__startApp = function(){
     }
   }
 
-  window.__selfAns=v=>{
-    const w=L[i];
-    const H=HISTORY[i]||{};
-    const ok=(v===true);
-    const prev=H.self;
-    
-    const q=P[w.h]||{s:0};
-    if(ok){ q.s=Math.min(2,(q.s||0)+1); } else { q.s=0; }
-    P[w.h]=q;
-
-    const wasOk = (prev===true);
-    if(wasOk && !ok) sc--;
-    if(!wasOk && ok) sc++;
-
-    wr = wr.filter(x=>x.h!==w.h);
-    if(!ok) wr.push(w);
-
-    H.self=v;H.ok=ok;H.done=true;
-    HISTORY[i]=H;
-    sv();
-    renderResult();
-  };
-
-  window.__nx=()=>{
-    const w=L[i];
-    const H=HISTORY[i];
-    if(!H||!H.done)return;
-    if(H.self===null || H.self===undefined){
-      if(H.hzOK===null && H.pyOK===null){
-        const q=P[w.h]||{s:0};q.s=0;P[w.h]=q;wr.push(w);H.self=false;
-      }else{
-        const ok=(H.hzOK!==false)&&(H.pyOK!==false)&&(H.hzOK!==null||H.pyOK!==null);
-        const q=P[w.h]||{s:0};q.s=ok?Math.min(2,q.s+1):0;P[w.h]=q;
-        if(ok)sc++;else wr.push(w);
-        H.self=ok;
-      }
-      sv();
-    }
-    i++;
-    if(i<L.length)window.__show();else end();
-  };
-  window.__back=()=>{if(i<=0)return;i--;window.__show()};
-  window.__forward=()=>{if(i>=L.length-1)return;i++;window.__show()};
-
   function end(){
     const wrongList = wr.slice();
     $.innerHTML=`<h1>Результат: ${sc} из ${L.length}</h1>
+      <p>Баланс: <img src="coin.png" class="coin" alt="🪙" onerror="this.replaceWith('🪙')"> ${COINS} ${pluralKulebyaka(COINS)}</p>
       ${wrongList.length?
         `<p>Повтори эти слова:</p>`+
         wrongList.map(w=>`<div class="r no"><span class="big">${w.h}</span> ${w.s.map(mark).join(" ")}<br>${w.ru}</div>`).join("")+
@@ -1547,6 +1958,7 @@ window.__startApp = function(){
     window.__go(wr.slice());
   };
 
+  // ============ числа ============
   const CH=["零","一","二","三","四","五","六","七","八","九"];
   const PY={零:"ling2",一:"yi1",二:"er4",两:"liang3",三:"san1",四:"si4",五:"wu3",六:"liu4",七:"qi1",八:"ba1",九:"jiu3",十:"shi2",百:"bai3",千:"qian1"};
   const U1=["","один","два","три","четыре","пять","шесть","семь","восемь","девять"];
@@ -1588,9 +2000,9 @@ window.__startApp = function(){
     else if(/[\u4e00-\u9fff]/.test(raw)){const t=raw.replace(/\s/g,"");ok=vs.some(x=>x.join("")===t)}
     else{
       const got=norm(raw);const targets=vs.map(x=>norm(x.map(c=>PY[c]).join(" ")));
+      const gotHasTone=/[0-4]/.test(raw)||/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(raw);
       if(targets.some(t=>t===got))ok=true;
-      else if(targets.some(t=>stripZero(t)===stripZero(got)))ok=true;
-      else if(targets.some(t=>noTone(t)===noTone(got))){ok=true;note="тоны не проверены"}
+      else if(gotHasTone && targets.some(t=>stripZero(t)===stripZero(got)))ok=true;
       else ok=false;
     }
     nTot++;if(ok)nOk++;nDone=true;a.disabled=true;
@@ -1600,6 +2012,7 @@ window.__startApp = function(){
     const b=document.getElementById("nb");b.textContent="Дальше";b.onclick=nNew;
   };
 
+  // ============ старт ============
   window.FB.onAuthStateChanged(window.FB.auth, async user=>{
     if(user){
       CURRENT_USER=user;
