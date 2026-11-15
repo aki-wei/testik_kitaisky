@@ -1805,13 +1805,18 @@ window.__startApp = function(){
     if(hzRaw.trim())hzOK=normHz(hzRaw)===normHz(w.h);
     let pyOK=null,pyNoTone=false;
     if(pyRaw.trim()){
-      const target=norm(w.s.join(" "));const got=norm(pyRaw);
-      const gotHasTone=/[0-4]/.test(pyRaw) || /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(pyRaw);
-      const targetHasTone=/[0-4]/.test(target);
-      if(got===target)pyOK=true;
-      else if(gotHasTone && stripZero(got)===stripZero(target))pyOK=true;
-      else if(targetHasTone && !gotHasTone)pyOK=false;
-      else pyOK=false;
+      const target=norm(w.s.join(" "));       // например "ma0"
+      const got=norm(pyRaw);                  // например "ma"
+      const gotHasTone=/[1-4]/.test(pyRaw) || /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(pyRaw);
+      // «нейтральный ввод без цифры» = got без 0, но target с 0 — эквивалентно
+      if(got===target){
+        pyOK=true;
+      } else if(stripZero(got)===stripZero(target)){
+        // слоги без цифр совпадают — проверяем тоны поштучно
+        pyOK = tonesMatch(got, target);
+      } else {
+        pyOK=false;
+      }
     }
     let ok;
     if(hzOK===null&&pyOK===null)ok=null;
