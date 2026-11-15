@@ -1652,7 +1652,17 @@ window.__startApp = function(){
       const newId=Date.now().toString(36)+Math.random().toString(36).slice(2,5);
       CUSTOM.push({id:newId,name:d.name||"Из чата"});
       const existing=new Set(X.map(w=>w.h));
-      (d.words||[]).forEach(w=>{ if(!existing.has(w.h)) X.push({...w, blk:"c:"+newId}); });
+      let added=0;
+      (d.words||[]).forEach(w=>{
+        if(existing.has(w.h)){
+          // слово уже есть в X — обновляем blk на этот блок, чтобы оно попало в блок
+          const idx = X.findIndex(x=>x.h===w.h);
+          if(idx>=0){ X[idx]={...X[idx], blk:"c:"+newId}; added++; }
+        }else{
+          X.push({...w, blk:"c:"+newId}); added++;
+        }
+      });
+      if(added===0){ alert("В блоке не было слов — блок создан пустым."); }
       sv();
       await window.FB.deleteDoc(window.FB.doc(window.FB.db,"users",CURRENT_USER.uid,"incoming",incId));
       INCOMING=INCOMING.filter(x=>x.id!==incId);
