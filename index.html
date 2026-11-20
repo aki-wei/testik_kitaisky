@@ -29,6 +29,13 @@ input[type=text].no{border-color:var(--no);background:var(--nob)}
 .chk{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}
 .chk input{width:20px;height:20px;margin:0;flex:none}
 .hs{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:10px 0}
+details.hs{padding:0;overflow:hidden}
+.boyaSummary{list-style:none;cursor:pointer;padding:14px 12px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.boyaSummary::-webkit-details-marker{display:none}
+.boyaSummary::after{content:"＋";color:var(--mu);font-size:18px}
+details[open]>.boyaSummary::after{content:"−"}
+.boyaContent{padding:0 12px 12px}
+.boyaContent>.b:first-child{margin-top:4px}
 .pb{height:8px;background:var(--bd);border-radius:4px;margin:6px 0}.pb i{display:block;height:100%;background:var(--ok);border-radius:4px}
 label{display:block;margin:10px 0;color:var(--mu)}
 small{color:var(--mu)}
@@ -1493,10 +1500,11 @@ window.__startApp = function(){
   }
   // ============ home ============
   function home(){
-    let all=[];
-    for(let n=1;n<=30;n++)all=all.concat(lw(n));
-    all=all.concat(X);
-    const totalAll=all0().length;
+    // Единый дедуплицированный список для обоих счётчиков:
+    // раньше числитель считался по lw()+X, а знаменатель — по all0(),
+    // из-за чего дубли слов могли давать разные значения.
+    const all=all0();
+    const totalAll=all.length;
     const k=all.filter(lr).length;
 
     const banner=INCOMING.length?INCOMING.map(it=>{
@@ -1643,18 +1651,30 @@ window.__startApp = function(){
         <button class="b" style="margin:0;flex:1" onclick="__markAll()">Отметить все</button></div>
         <div class="tiny" id="selInfo"></div>`:""}
 
-      ${ls}
+      <details class="hs" id="boyaChinese">
+        <summary class="boyaSummary">📚 BOYA CHINESE (2016)</summary>
+        <div class="boyaContent">
+          ${ls}
 
-      <div class="hs"><b>Мои блоки</b>${blkRows||`<div class="tiny">Блоков пока нет.</div>`}
-        <input type="text" id="bn" placeholder="Название нового блока">
-        <button class="b" onclick="__addBlock()">Создать блок</button></div>
+          <div class="hs"><b>Мои блоки</b>${blkRows||`<div class="tiny">Блоков пока нет.</div>`}
+            <input type="text" id="bn" placeholder="Название нового блока">
+            <button class="b" onclick="__addBlock()">Создать блок</button></div>
 
-      ${unsortedBlock}
+          ${unsortedBlock}
+        </div>
+      </details>
 
       <div class="hs"><b>Мои слова</b>
         <div class="tiny" style="margin-bottom:6px">Только неразложенные.</div>
         <input type="text" id="xh" placeholder="Иероглифы"><input type="text" id="xp" placeholder="Пиньинь с цифрами: xi2 guan4" autocapitalize="off"><input type="text" id="xr" placeholder="Перевод"><button class="b" onclick="__addX()">Добавить слово</button><small id="xm"></small>
         <div class="wlist" id="wlist"></div></div>`;
+    const boya=document.getElementById("boyaChinese");
+    if(boya){
+      try{
+        boya.open=localStorage.getItem("boyaChineseOpen")==="1";
+        boya.addEventListener("toggle",()=>localStorage.setItem("boyaChineseOpen",boya.open?"1":"0"));
+      }catch(e){}
+    }
     renderWords();
     if(SELECT_MODE)updateSelInfo();
     if(SHOW_AVA) renderAvaP2();
@@ -2290,24 +2310,75 @@ window.__startApp = function(){
 
   // ============ числа ============
   const CH=["零","一","二","三","四","五","六","七","八","九"];
-  const PY={零:"ling2",一:"yi1",二:"er4",两:"liang3",三:"san1",四:"si4",五:"wu3",六:"liu4",七:"qi1",八:"ba1",九:"jiu3",十:"shi2",百:"bai3",千:"qian1"};
+  const PY={零:"ling2",一:"yi1",二:"er4",两:"liang3",三:"san1",四:"si4",五:"wu3",六:"liu4",七:"qi1",八:"ba1",九:"jiu3",十:"shi2",百:"bai3",千:"qian1",万:"wan4"};
   const U1=["","один","два","три","четыре","пять","шесть","семь","восемь","девять"];
   const TE=["десять","одиннадцать","двенадцать","тринадцать","четырнадцать","пятнадцать","шестнадцать","семнадцать","восемнадцать","девятнадцать"];
   const TY=["","","двадцать","тридцать","сорок","пятьдесят","шестьдесят","семьдесят","восемьдесят","девяносто"];
   const HU=["","сто","двести","триста","четыреста","пятьсот","шестьсот","семьсот","восемьсот","девятьсот"];
-  function ruWords(n){const t=Math.floor(n/1000),h=Math.floor(n/100)%10,r=n%100;
-   const th=t==1?"одна тысяча":t==2?"две тысячи":t==3?"три тысячи":t==4?"четыре тысячи":U1[t]+" тысяч";
-   const rest=r<10?U1[r]:r<20?TE[r-10]:TY[Math.floor(r/10)]+(r%10?" "+U1[r%10]:"");
-   return[th,HU[h],rest].filter(Boolean).join(" ")}
-  function zhVariants(n){const d=[...String(n)].map(Number),t=[];
-   t.push(d[0]==2?["两","二"]:[CH[d[0]]]);t.push(["千"]);
-   if(d[1]){t.push(d[1]==2?["两","二"]:[CH[d[1]]]);t.push(["百"])}
-   if(d[2]){if(!d[1])t.push(["零"]);t.push([CH[d[2]]]);t.push(["十"])}else if(d[3])t.push(["零"]);
-   if(d[3])t.push([CH[d[3]]]);
-   let v=[[]];t.forEach(o=>{v=v.flatMap(a=>o.map(x=>[...a,x]))});return v}
+  function ruTriplet(n,feminine=false){
+    const units=feminine?["","одна","две","три","четыре","пять","шесть","семь","восемь","девять"]:U1;
+    const h=Math.floor(n/100),r=n%100;
+    const rest=r<10?units[r]:r<20?TE[r-10]:TY[Math.floor(r/10)]+(r%10?" "+units[r%10]:"");
+    return [HU[h],rest].filter(Boolean).join(" ");
+  }
+  function ruPlural(n,one,two,five){
+    const a=n%100,b=n%10;
+    if(a>=11&&a<=14)return five;
+    if(b===1)return one;
+    if(b>=2&&b<=4)return two;
+    return five;
+  }
+  function ruWords(n){
+    const parts=[];
+    const millions=Math.floor(n/1000000);
+    const thousands=Math.floor(n/1000)%1000;
+    const rest=n%1000;
+    if(millions)parts.push(ruTriplet(millions)+" "+ruPlural(millions,"миллион","миллиона","миллионов"));
+    if(thousands)parts.push(ruTriplet(thousands,true)+" "+ruPlural(thousands,"тысяча","тысячи","тысяч"));
+    if(rest)parts.push(ruTriplet(rest));
+    return parts.join(" ");
+  }
+  function sectionVariants(value){
+    if(!value)return [[]];
+    const digits=[Math.floor(value/1000),Math.floor(value/100)%10,Math.floor(value/10)%10,value%10];
+    const units=["千","百","十",""];
+    const tokens=[];let seenNonZero=false,zeroPending=false;
+    for(let i=0;i<4;i++){
+      const digit=digits[i];
+      if(!digit){if(seenNonZero&&digits.slice(i+1).some(Boolean))zeroPending=true;continue}
+      if(zeroPending){tokens.push(["零"]);zeroPending=false}
+      const unit=units[i];
+      if(digit===1&&i===2&&!seenNonZero){ /* leading 一 is omitted before 十 */ }
+      else if(digit===2&&(i===0||i===1))tokens.push(["两","二"]);
+      else tokens.push([CH[digit]]);
+      if(unit)tokens.push([unit]);
+      seenNonZero=true;
+    }
+    let variants=[[]];
+    for(const choices of tokens)variants=variants.flatMap(a=>choices.map(x=>[...a,x]));
+    return variants;
+  }
+  function zhVariants(n){
+    if(n<10000)return sectionVariants(n);
+    const high=Math.floor(n/10000),low=n%10000;
+    let prefixes=sectionVariants(high);
+    if(high===2)prefixes=[["两"],["二"]];
+    prefixes=prefixes.map(v=>[...v,"万"]);
+    if(!low)return prefixes;
+    const suffixes=sectionVariants(low);
+    const needsZero=low<1000;
+    return prefixes.flatMap(prefix=>suffixes.map(suffix=>[
+      ...prefix,...(needsZero?["零"]:[]),...suffix
+    ]));
+  }
   let ND="cz",NS="d",nN=0,nOk=0,nTot=0,nDone=false;
   window.__numHome=()=>{nOk=0;nTot=0;nNew()};
-  function nNew(){nN=1000+Math.floor(Math.random()*9000);nDone=false;nShow()}
+  function nNew(){
+    const digits=4+Math.floor(Math.random()*4);
+    const min=10**(digits-1),max=10**digits;
+    nN=min+Math.floor(Math.random()*(max-min));
+    nDone=false;nShow();
+  }
   window.__nSet=x=>{ND=x;nNew()};
   window.__nStyle=x=>{NS=x;nNew()};
   function nShow(){
